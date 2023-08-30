@@ -1,0 +1,356 @@
+[
+    {
+        "id": 0,
+        "name": "ボールドマーカー",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 1,
+        "name": "わかばシューター",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 2,
+        "name": "シャープマーカー",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 3,
+        "name": "プロモデラー",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 4,
+        "name": "スプラシューター",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 5,
+        "name": ".52ガロン",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 6,
+        "name": "N-ZAP",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 7,
+        "name": "プライムシューター",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 8,
+        "name": ".96ガロン",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 9,
+        "name": "ジェットスイーパー",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 10,
+        "name": "L3リールガン",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 11,
+        "name": "H3リールガン",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 12,
+        "name": "ボトルガイザー",
+        "seasonid": 0,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 13,
+        "name": "カーボンローラー",
+        "seasonid": 0,
+        "weaponTypeid": 1
+    },
+    {
+        "id": 14,
+        "name": "スプラローラー",
+        "seasonid": 0,
+        "weaponTypeid": 1
+    },
+    {
+        "id": 15,
+        "name": "ダイナモローラー",
+        "seasonid": 0,
+        "weaponTypeid": 1
+    },
+    {
+        "id": 16,
+        "name": "ヴァリアブルローラー",
+        "seasonid": 0,
+        "weaponTypeid": 1
+    },
+    {
+        "id": 17,
+        "name": "スクイックリン",
+        "seasonid": 0,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 18,
+        "name": "スプラチャージャー",
+        "seasonid": 0,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 19,
+        "name": "リッター4K",
+        "seasonid": 0,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 20,
+        "name": "14式丈筒銃",
+        "seasonid": 0,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 21,
+        "name": "ソイチューバー",
+        "seasonid": 0,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 22,
+        "name": "バケットスロッシャー",
+        "seasonid": 0,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 23,
+        "name": "ヒッセン",
+        "seasonid": 0,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 24,
+        "name": "スクリュースロッシャー",
+        "seasonid": 0,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 25,
+        "name": "オーバーフロッシャー",
+        "seasonid": 0,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 26,
+        "name": "エクスプロッシャー",
+        "seasonid": 0,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 27,
+        "name": "スプラスピナー",
+        "seasonid": 0,
+        "weaponTypeid": 4
+    },
+    {
+        "id": 28,
+        "name": "バレルスピナー",
+        "seasonid": 0,
+        "weaponTypeid": 4
+    },
+    {
+        "id": 29,
+        "name": "ハイドラント",
+        "seasonid": 0,
+        "weaponTypeid": 4
+    },
+    {
+        "id": 30,
+        "name": "クーゲルシュライバー",
+        "seasonid": 0,
+        "weaponTypeid": 4
+    },
+    {
+        "id": 31,
+        "name": "ノーチラス",
+        "seasonid": 0,
+        "weaponTypeid": 4
+    },
+    {
+        "id": 32,
+        "name": "スパッタリー",
+        "seasonid": 0,
+        "weaponTypeid": 5
+    },
+    {
+        "id": 33,
+        "name": "スプラマニューバー",
+        "seasonid": 0,
+        "weaponTypeid": 5
+    },
+    {
+        "id": 34,
+        "name": "ケルビン525",
+        "seasonid": 0,
+        "weaponTypeid": 5
+    },
+    {
+        "id": 35,
+        "name": "デュアルスイーパー",
+        "seasonid": 0,
+        "weaponTypeid": 5
+    },
+    {
+        "id": 36,
+        "name": "クアッドホッパー",
+        "seasonid": 0,
+        "weaponTypeid": 5
+    },
+    {
+        "id": 37,
+        "name": "パラシェルター",
+        "seasonid": 0,
+        "weaponTypeid": 6
+    },
+    {
+        "id": 38,
+        "name": "キャンピングシェルター",
+        "seasonid": 0,
+        "weaponTypeid": 6
+    },
+    {
+        "id": 39,
+        "name": "スパイガジェット",
+        "seasonid": 0,
+        "weaponTypeid": 6
+    },
+    {
+        "id": 40,
+        "name": "ノヴァブラスター",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 41,
+        "name": "ホットブラスター",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 42,
+        "name": "ロングブラスター",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 43,
+        "name": "クラッシュブラスター",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 44,
+        "name": "ラピッドブラスター",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 45,
+        "name": "Rブラスターエリート",
+        "seasonid": 0,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 46,
+        "name": "パブロ",
+        "seasonid": 0,
+        "weaponTypeid": 8
+    },
+    {
+        "id": 47,
+        "name": "ホクサイ",
+        "seasonid": 0,
+        "weaponTypeid": 8
+    },
+    {
+        "id": 48,
+        "name": "トライストリンガー",
+        "seasonid": 0,
+        "weaponTypeid": 9
+    },
+    {
+        "id": 49,
+        "name": "LACT",
+        "seasonid": 0,
+        "weaponTypeid": 9
+    },
+    {
+        "id": 50,
+        "name": "ジムワイパー",
+        "seasonid": 0,
+        "weaponTypeid": 10
+    },
+    {
+        "id": 51,
+        "name": "ドライブワイパー",
+        "seasonid": 0,
+        "weaponTypeid": 10
+    },
+    {
+        "id": 52,
+        "name": "スペースシューター",
+        "seasonid": 1,
+        "weaponTypeid": 0
+    },
+    {
+        "id": 53,
+        "name": "ワイドローラー",
+        "seasonid": 1,
+        "weaponTypeid": 1
+    },
+    {
+        "id": 54,
+        "name": "R-PEN",
+        "seasonid": 1,
+        "weaponTypeid": 2
+    },
+    {
+        "id": 55,
+        "name": "S-BLAST",
+        "seasonid": 3,
+        "weaponTypeid": 7
+    },
+    {
+        "id": 56,
+        "name": "フィンセント",
+        "seasonid": 3,
+        "weaponTypeid": 8
+    },
+    {
+        "id": 57,
+        "name": "モップリン",
+        "seasonid": 4,
+        "weaponTypeid": 3
+    },
+    {
+        "id": 58,
+        "name": "イグザミナー",
+        "seasonid": 4,
+        "weaponTypeid": 4
+    }
+]

@@ -1,0 +1,7 @@
+dist/
+node_modules/
+.yarn/
+examples/*/dist/
+
+# Ignore all Markdown files:
+**/*.md
