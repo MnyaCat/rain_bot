@@ -4,7 +4,7 @@ import { GatewayIntentBits } from "discord.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-dotenv.config({ path: `.env.${process.env.NODE_ENV}.local`, override: true });
+dotenv.config({ path: `./.env.${process.env.NODE_ENV}.local`, override: true });
 
 const envs = new Map<string, string | undefined>();
 envs.set("datasource", process.env.SPLATOON_DB_URL);
