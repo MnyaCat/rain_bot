@@ -29,19 +29,23 @@ export class UserCommand extends Command {
     ) {
         const prisma = container.database;
         const subWeapons = await prisma.subWeapon.findMany();
-        const subWeaponChoices = subWeapons.map((value) => {
-            return {
-                name: value.name,
-                value: value.id,
-            } as APIApplicationCommandOptionChoice<number>;
-        });
+        const subWeaponChoices = subWeapons.map(
+            (value: { id: number; name: string; seasonId: number }) => {
+                return {
+                    name: value.name,
+                    value: value.id,
+                } as APIApplicationCommandOptionChoice<number>;
+            }
+        );
         const specialWeapons = await prisma.specialWeapon.findMany();
-        const specialWeaponChoices = specialWeapons.map((value) => {
-            return {
-                name: value.name,
-                value: value.id,
-            } as APIApplicationCommandOptionChoice<number>;
-        });
+        const specialWeaponChoices = specialWeapons.map(
+            (value: { id: number; name: string; seasonId: number }) => {
+                return {
+                    name: value.name,
+                    value: value.id,
+                } as APIApplicationCommandOptionChoice<number>;
+            }
+        );
         registry.registerChatInputCommand(
             (builder) =>
                 builder //
@@ -166,7 +170,11 @@ export class UserCommand extends Command {
             .setFooter({ text: fotterText });
 
         if (single) {
-            const randomWeapon = getRandomWeapon(weapons);
+            const randomWeapon = getRandomWeapon(weapons) as {
+                id: number;
+                name: string;
+                seasonId: number;
+            };
             embed.setDescription(randomWeapon.name);
         } else {
             let voiceChannel: VoiceBasedChannel;
@@ -184,7 +192,11 @@ export class UserCommand extends Command {
             );
             const results = [];
             for (let i = 0; i < memberMentions.length; i++) {
-                const weapon = getRandomWeapon(weapons);
+                const weapon = getRandomWeapon(weapons) as {
+                    id: number;
+                    name: string;
+                    seasonId: number;
+                };
                 results.push(`${memberMentions[i]}: ${weapon.name}`);
             }
             embed.setDescription(results.join("\n"));
