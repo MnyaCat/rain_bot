@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../prisma/generated/splatoon_client";
 import { container, SapphireClient } from "@sapphire/framework";
 import { GatewayIntentBits } from "discord.js";
 import * as dotenv from "dotenv";
