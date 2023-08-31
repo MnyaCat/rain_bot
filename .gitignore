@@ -37,3 +37,4 @@ package-lock.json
 prisma/migrations
 prisma/generated
 dev.db
+prisma-script.ts
