@@ -35,4 +35,5 @@ package-lock.json
 
 # Prisma
 prisma/migrations
+prisma/generated
 dev.db
