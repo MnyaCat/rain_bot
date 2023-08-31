@@ -20,7 +20,6 @@ import "./mc_listener";
 
 export class RainClient extends SapphireClient {
     public constructor() {
-        // We call super our options
         super({
             intents: [
                 GatewayIntentBits.Guilds,
@@ -45,7 +44,7 @@ export class RainClient extends SapphireClient {
 
 declare module "@sapphire/pieces" {
     interface Container {
-        database: PrismaClient; // Replace this with the connection type of your database library
+        database: PrismaClient;
     }
 }
 
