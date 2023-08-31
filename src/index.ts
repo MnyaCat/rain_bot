@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../prisma/generated/splatoon_client";
 import { container, SapphireClient } from "@sapphire/framework";
 import { GatewayIntentBits } from "discord.js";
 import * as dotenv from "dotenv";
 
 dotenv.config();
-dotenv.config({ path: `.env.${process.env.NODE_ENV}.local`, override: true });
+dotenv.config({ path: `./.env.${process.env.NODE_ENV}.local`, override: true });
 
 const envs = new Map<string, string | undefined>();
 envs.set("datasource", process.env.SPLATOON_DB_URL);
