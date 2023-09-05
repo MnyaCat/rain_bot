@@ -59,6 +59,10 @@ export class UserCommand extends Command {
                     value: value.id,
                 } as APIApplicationCommandOptionChoice<number>;
             }
+        const seasonChoices = generateChoices(await prisma.season.findMany());
+        const weaponTypeChoices = generateChoices(
+            await prisma.weaponType.findMany()
+        );
         );
         registry.registerChatInputCommand(
             (builder) =>
@@ -86,6 +90,22 @@ export class UserCommand extends Command {
                                         "スペシャルウェポンのフィルター。指定したスペシャルウェポンのブキから選ばれます。"
                                     )
                                     .addChoices(...specialWeaponChoices)
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setDescription(
+                                        "ブキを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("weapontype")
+                                    .setDescription(
+                                        "ブキをタイプで絞り込みます。"
+                                    )
+                                    .addChoices(...weaponTypeChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
@@ -132,6 +152,9 @@ export class UserCommand extends Command {
         const subId = interaction.options.getNumber("sub_filter") ?? undefined;
         const specialId =
             interaction.options.getNumber("special_filter") ?? undefined;
+        const seasonId = interaction.options.getNumber("season") ?? undefined;
+        const weaponTypeId =
+            interaction.options.getNumber("weapontype") ?? undefined;
         const prisma = container.database;
 
         const asyncWeapons = async () => {
@@ -141,6 +164,8 @@ export class UserCommand extends Command {
                         where: {
                             subWeaponId: subId,
                             specialWeaponId: specialId,
+                            seasonId: seasonId,
+                            weaponTypeId: weaponTypeId,
                         },
                     });
                 }
@@ -154,6 +179,32 @@ export class UserCommand extends Command {
         };
         const weapons = await asyncWeapons();
         if (subCommand === "weapon" && weapons.length < 1) {
+            const filters = [
+                await prisma.subWeapon.findFirst({ where: { id: subId } }),
+                await prisma.specialWeapon.findFirst({
+                    where: { id: specialId },
+                }),
+                await prisma.season.findFirst({ where: { id: seasonId } }),
+                await prisma.weaponType.findFirst({
+                    where: { id: weaponTypeId },
+                }),
+            ];
+            const filterNames = [
+                "サブウェポン",
+                "スペシャルウェポン",
+                "シーズン",
+                "ブキタイプ",
+            ];
+
+            const filtersTexts = [];
+            for (let i = 0; i < filters.length; i++) {
+                const filter = filters[i];
+                const filterName = filterNames[i];
+                if (filter != null) {
+                    filtersTexts.push(`${filterName}: ${filter}`);
+                }
+            }
+
             const subWeapon = await prisma.subWeapon.findFirst({
                 where: { id: subId },
             });
@@ -177,7 +228,14 @@ export class UserCommand extends Command {
             ["subweapon", "サブウェポン"],
             ["specialweapon", "スペシャルウェポン"],
         ]).get(subCommand);
-        const fotterText = `sub_filter: ${subId}, special_filter: ${specialId}, single: ${single}`;
+        const options = {
+            subId,
+            specialId,
+            seasonId,
+            weaponTypeId,
+            single,
+        };
+        const fotterText = JSON.stringify(options);
 
         const embed = new EmbedBuilder()
             .setTitle(`ランダムな${weaponCategory}を支給します！`)
