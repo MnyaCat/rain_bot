@@ -42,27 +42,15 @@ export class UserCommand extends Command {
         registry: Command.Registry
     ) {
         const prisma = container.database;
-        const subWeapons = await prisma.subWeapon.findMany();
-        const subWeaponChoices = subWeapons.map(
-            (value: { id: number; name: string; seasonId: number }) => {
-                return {
-                    name: value.name,
-                    value: value.id,
-                } as APIApplicationCommandOptionChoice<number>;
-            }
+        const subWeaponChoices = generateChoices(
+            await prisma.subWeapon.findMany()
         );
-        const specialWeapons = await prisma.specialWeapon.findMany();
-        const specialWeaponChoices = specialWeapons.map(
-            (value: { id: number; name: string; seasonId: number }) => {
-                return {
-                    name: value.name,
-                    value: value.id,
-                } as APIApplicationCommandOptionChoice<number>;
-            }
+        const specialWeaponChoices = generateChoices(
+            await prisma.specialWeapon.findMany()
+        );
         const seasonChoices = generateChoices(await prisma.season.findMany());
         const weaponTypeChoices = generateChoices(
             await prisma.weaponType.findMany()
-        );
         );
         registry.registerChatInputCommand(
             (builder) =>
@@ -77,17 +65,17 @@ export class UserCommand extends Command {
                             )
                             .addNumberOption((option) =>
                                 option
-                                    .setName("sub_filter")
+                                    .setName("sub")
                                     .setDescription(
-                                        "サブウェポンのフィルター。指定したサブウェポンのブキから選ばれます。"
+                                        "ブキをサブウェポンで絞り込みます。"
                                     )
                                     .addChoices(...subWeaponChoices)
                             )
                             .addNumberOption((option) =>
                                 option
-                                    .setName("special_filter")
+                                    .setName("special")
                                     .setDescription(
-                                        "スペシャルウェポンのフィルター。指定したスペシャルウェポンのブキから選ばれます。"
+                                        "ブキをスペシャルウェポンで絞り込みます。"
                                     )
                                     .addChoices(...specialWeaponChoices)
                             )
@@ -149,9 +137,8 @@ export class UserCommand extends Command {
             | "subweapon"
             | "specialweapon";
         const single = interaction.options.getBoolean("single") ?? false;
-        const subId = interaction.options.getNumber("sub_filter") ?? undefined;
-        const specialId =
-            interaction.options.getNumber("special_filter") ?? undefined;
+        const subId = interaction.options.getNumber("sub") ?? undefined;
+        const specialId = interaction.options.getNumber("special") ?? undefined;
         const seasonId = interaction.options.getNumber("season") ?? undefined;
         const weaponTypeId =
             interaction.options.getNumber("weapontype") ?? undefined;
