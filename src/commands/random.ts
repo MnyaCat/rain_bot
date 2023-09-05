@@ -17,6 +17,20 @@ function getRandomWeapon<T>(weapons: Array<T>): T {
     return weapons[index];
 }
 
+function generateChoices(
+    weapons: {
+        id: number;
+        name: string;
+    }[]
+) {
+    return weapons.map((weapon) => {
+        return {
+            name: weapon.name,
+            value: weapon.id,
+        } as APIApplicationCommandOptionChoice<number>;
+    });
+}
+
 @ApplyOptions<Command.Options>({
     name: "random",
     description:
