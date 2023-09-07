@@ -188,24 +188,13 @@ export class UserCommand extends Command {
                 const filter = filters[i];
                 const filterName = filterNames[i];
                 if (filter != null) {
-                    filtersTexts.push(`${filterName}: ${filter}`);
+                    filtersTexts.push(`- ${filterName}: ${filter.name}`);
                 }
             }
 
-            const subWeapon = await prisma.subWeapon.findFirst({
-                where: { id: subId },
-            });
-            const subFilter =
-                subWeapon != null ? `\nサブウェポン: ${subWeapon.name}` : "";
-            const specialWeapon = await prisma.specialWeapon.findFirst({
-                where: { id: specialId },
-            });
-            const specialFilter =
-                specialWeapon != null
-                    ? `\nスペシャルウェポン: ${specialWeapon.name}`
-                    : "";
             const embed = errorEmbed(
-                `以下の条件に合うブキがありません。${subFilter}${specialFilter}`
+                "以下の条件に合うブキがありません。\n\n" +
+                    filtersTexts.join("\n")
             );
             return interaction.reply({ embeds: [embed] });
         }
