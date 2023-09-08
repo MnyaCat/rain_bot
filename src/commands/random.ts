@@ -12,25 +12,6 @@ import { errorEmbed } from "../utils/embed_builder";
 const commandId = process.env.RANDOM_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
 
-function getRandomWeapon<T>(weapons: Array<T>): T {
-    const index = Math.floor(Math.random() * weapons.length);
-    return weapons[index];
-}
-
-function generateChoices(
-    weapons: {
-        id: number;
-        name: string;
-    }[]
-) {
-    return weapons.map((weapon) => {
-        return {
-            name: weapon.name,
-            value: weapon.id,
-        } as APIApplicationCommandOptionChoice<number>;
-    });
-}
-
 @ApplyOptions<Command.Options>({
     name: "random",
     description:
@@ -251,4 +232,23 @@ export class UserCommand extends Command {
         }
         return interaction.reply({ embeds: [embed] });
     }
+}
+
+function generateChoices(
+    weapons: {
+        id: number;
+        name: string;
+    }[]
+) {
+    return weapons.map((weapon) => {
+        return {
+            name: weapon.name,
+            value: weapon.id,
+        } as APIApplicationCommandOptionChoice<number>;
+    });
+}
+
+function getRandomWeapon<T>(weapons: Array<T>): T {
+    const index = Math.floor(Math.random() * weapons.length);
+    return weapons[index];
 }
