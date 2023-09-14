@@ -42,3 +42,10 @@ export async function getVoiceChannel(
         return voiceChannel;
     }
 }
+
+export async function getVoiceChannelMembers(
+    interaction: ChatInputCommandInteraction
+): Promise<GuildMember[]> {
+    const voiceChannel = await getVoiceChannel(interaction);
+    return [...voiceChannel.members.values()];
+}
