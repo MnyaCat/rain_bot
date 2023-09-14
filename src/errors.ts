@@ -18,3 +18,11 @@ export class MemberVoiceChannelNotFoundError extends Error {
         Object.setPrototypeOf(this, MemberVoiceChannelNotFoundError.prototype);
     }
 }
+
+export class WeaponNotFoundError extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "There is no buki that meets the requirements.");
+        this.name = "WeaponNotFoundError";
+        Object.setPrototypeOf(this, WeaponNotFoundError.prototype);
+    }
+}
