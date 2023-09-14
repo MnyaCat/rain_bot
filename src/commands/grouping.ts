@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder, VoiceBasedChannel } from "discord.js";
-import { getMemberVoiceChannel } from "../utils/utils";
+import { getVoiceChannel } from "../utils/utils";
 import {
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
@@ -83,7 +83,7 @@ export class GroupingCommand extends Command {
 
         let voiceChannel: VoiceBasedChannel;
         try {
-            voiceChannel = await getMemberVoiceChannel(interaction);
+            voiceChannel = await getVoiceChannel(interaction);
         } catch (error) {
             if (error instanceof GuildMemberNotFoundError) {
                 return;

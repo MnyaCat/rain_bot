@@ -27,7 +27,7 @@ export async function getExecutedMember(
     }
 }
 
-export async function getMemberVoiceChannel(
+export async function getVoiceChannel(
     interaction: ChatInputCommandInteraction
 ): Promise<VoiceBasedChannel> {
     const member = await getExecutedMember(interaction);
