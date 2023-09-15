@@ -3,11 +3,13 @@ import { Command, container } from "@sapphire/framework";
 import {
     APIApplicationCommandOptionChoice,
     ActionRowBuilder,
+    BaseMessageOptions,
     ButtonBuilder,
+    ButtonInteraction,
     ButtonStyle,
     EmbedBuilder,
     GuildMember,
-    InteractionReplyOptions,
+    time,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
 import {
@@ -151,20 +153,20 @@ export class UserCommand extends Command {
             try {
                 switch (subCommand) {
                     case "weapon":
-                        return UserCommand.buildRandomWeaponResult(
+                        return UserCommand.buildRandomWeaponResult({
                             interaction,
-                            options
-                        );
+                            options,
+                        });
                     case "subweapon":
-                        return UserCommand.buildRandomSubWeaponResult(
+                        return UserCommand.buildRandomSubWeaponResult({
                             interaction,
-                            options
-                        );
+                            options,
+                        });
                     case "specialweapon":
-                        return UserCommand.buildRandomSpecialWeaponResult(
+                        return UserCommand.buildRandomSpecialWeaponResult({
                             interaction,
-                            options
-                        );
+                            options,
+                        });
                 }
             } catch (error) {
                 if (
@@ -183,10 +185,15 @@ export class UserCommand extends Command {
         }
     }
 
-    public static async buildRandomWeaponResult(
-        interaction: Command.ChatInputCommandInteraction,
-        options: RandomCommandOptions
-    ) {
+    public static async buildRandomWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
         const prisma = container.database;
         const weapons = await prisma.weapon.findMany({
             where: {
@@ -207,27 +214,38 @@ export class UserCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed(weapon, weaponCategory, options);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers(interaction);
-            embed = generateResultEmbed(
+            embed = generateResultEmbed({
                 members,
                 weapons,
                 weaponCategory,
-                options
-            );
+                options,
+                timestamp: timestamp,
+            });
         }
         const row = buildRerollActionRow(rerollButtonIds.weapon);
         return {
             embeds: [embed],
             components: [row],
-        } as InteractionReplyOptions;
+        } as BaseMessageOptions;
     }
 
-    public static async buildRandomSubWeaponResult(
-        interaction: Command.ChatInputCommandInteraction,
-        options: RandomCommandOptions
-    ) {
+    public static async buildRandomSubWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
         const prisma = container.database;
         const weapons = await prisma.subWeapon.findMany();
         const weaponCategory = weaponCategoryName.subWeapon;
@@ -235,27 +253,38 @@ export class UserCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed(weapon, weaponCategory, options);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers(interaction);
-            embed = generateResultEmbed(
+            embed = generateResultEmbed({
                 members,
                 weapons,
                 weaponCategory,
-                options
-            );
+                options,
+                timestamp: timestamp,
+            });
         }
         const row = buildRerollActionRow(rerollButtonIds.subWeapon);
         return {
             embeds: [embed],
             components: [row],
-        } as InteractionReplyOptions;
+        } as BaseMessageOptions;
     }
 
-    public static async buildRandomSpecialWeaponResult(
-        interaction: Command.ChatInputCommandInteraction,
-        options: RandomCommandOptions
-    ) {
+    public static async buildRandomSpecialWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
         const prisma = container.database;
         const weapons = await prisma.specialWeapon.findMany();
         const weaponCategory = weaponCategoryName.specialWeapon;
@@ -263,21 +292,27 @@ export class UserCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed(weapon, weaponCategory, options);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers(interaction);
-            embed = generateResultEmbed(
+            embed = generateResultEmbed({
                 members,
                 weapons,
                 weaponCategory,
-                options
-            );
+                options,
+                timestamp: timestamp,
+            });
         }
         const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
         return {
             embeds: [embed],
             components: [row],
-        } as InteractionReplyOptions;
+        } as BaseMessageOptions;
     }
 }
 
@@ -295,7 +330,7 @@ function generateChoices(
     });
 }
 
-interface RandomCommandOptions {
+export interface RandomCommandOptions {
     subWeaponId?: number;
     specialWeaponId?: number;
     seasonId?: number;
@@ -352,25 +387,42 @@ async function generateNotFoundErrorEmbed(options: RandomCommandOptions) {
     );
 }
 
-function generateSingleResultEmbed(
-    weapon: Weapon | SubWeapon | SpecialWeapon,
-    weaponCategory: string,
-    options: RandomCommandOptions
-) {
+function generateSingleResultEmbed({
+    weapon,
+    weaponCategory,
+    options,
+    timestamp,
+}: {
+    weapon: Weapon | SubWeapon | SpecialWeapon;
+    weaponCategory: string;
+    options: RandomCommandOptions;
+    timestamp?: boolean;
+}) {
     const fotterText = JSON.stringify(options);
+    let description = weapon.name;
+    if (timestamp) {
+        description += `\n更新: ${time(new Date(), "T")}`;
+    }
     const embed = new EmbedBuilder()
         .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(weapon.name)
+        .setDescription(description)
         .setFooter({ text: fotterText });
     return embed;
 }
 
-function generateResultEmbed(
-    members: GuildMember[],
-    weapons: Weapon[] | SubWeapon[] | SpecialWeapon[],
-    weaponCategory: string,
-    options: RandomCommandOptions
-) {
+function generateResultEmbed({
+    members,
+    weapons,
+    weaponCategory,
+    options,
+    timestamp = false,
+}: {
+    members: GuildMember[];
+    weapons: Weapon[] | SubWeapon[] | SpecialWeapon[];
+    weaponCategory: string;
+    options: RandomCommandOptions;
+    timestamp?: boolean;
+}) {
     const results: string[] = [];
     for (let i = 0; i < members.length; i++) {
         const member = members[i];
@@ -378,7 +430,10 @@ function generateResultEmbed(
         const mention = `<@${member.id}>`;
         results.push(`${mention}: ${weapon.name}`);
     }
-    const description = results.join("\n");
+    let description = results.join("\n");
+    if (timestamp) {
+        description += `\n更新: ${time(new Date(), "T")}`;
+    }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
         .setTitle(`ランダムな${weaponCategory}を支給します！`)

@@ -26,3 +26,11 @@ export class WeaponNotFoundError extends RainBotBaseError {
         Object.setPrototypeOf(this, WeaponNotFoundError.prototype);
     }
 }
+
+export class CommandOptionFetchFailedError extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "Failed to fetch command options.");
+        this.name = "CommandOptionFetchFailedError";
+        Object.setPrototypeOf(this, CommandOptionFetchFailedError.prototype);
+    }
+}
