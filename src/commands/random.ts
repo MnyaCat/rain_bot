@@ -245,7 +245,7 @@ export class UserCommand extends Command {
                 options
             );
         }
-        const row = buildRerollActionRow(rerollButtonIds.weapon);
+        const row = buildRerollActionRow(rerollButtonIds.subWeapon);
         return {
             embeds: [embed],
             components: [row],
@@ -273,7 +273,7 @@ export class UserCommand extends Command {
                 options
             );
         }
-        const row = buildRerollActionRow(rerollButtonIds.weapon);
+        const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
         return {
             embeds: [embed],
             components: [row],
