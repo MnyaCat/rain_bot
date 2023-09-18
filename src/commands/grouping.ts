@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder, VoiceBasedChannel } from "discord.js";
-import { getMemberVoiceChannel } from "../utils/utils";
+import { getVoiceChannel } from "../utils/utils";
 import {
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
@@ -52,6 +52,13 @@ export class GroupingCommand extends Command {
                             .setDescription(
                                 "1つのグループに参加できる最大のユーザー数"
                             )
+                    )
+                    .addStringOption((option) =>
+                        option
+                            .setName("exclude")
+                            .setDescription(
+                                "グループ分けの対象に含めないメンバー。メンションで指定してください。"
+                            )
                     ),
             { idHints: idHints }
         );
@@ -61,6 +68,7 @@ export class GroupingCommand extends Command {
         interaction: Command.ChatInputCommandInteraction
     ) {
         const maxGroupSize = interaction.options.getNumber("groupsize") ?? 4;
+        const exclude = interaction.options.getString("exclude") ?? "";
 
         if (maxGroupSize < 2) {
             const embed = errorEmbed(
@@ -69,9 +77,13 @@ export class GroupingCommand extends Command {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
+        const excludeMemberIds = [
+            ...exclude.matchAll(/<@!?(?<id>\d{17,20})>/g),
+        ].map((value) => value[1]);
+
         let voiceChannel: VoiceBasedChannel;
         try {
-            voiceChannel = await getMemberVoiceChannel(interaction);
+            voiceChannel = await getVoiceChannel(interaction);
         } catch (error) {
             if (error instanceof GuildMemberNotFoundError) {
                 return;
@@ -82,17 +94,31 @@ export class GroupingCommand extends Command {
             }
         }
 
-        const memberMentions = voiceChannel.members.map(
-            (member) => `<@${member.id}>`
+        const voiceChannnelMembers = voiceChannel.members.map(
+            (member) => member.id
         );
+        const includeMemberMentions = [];
+        for (let i = 0; i < voiceChannnelMembers.length; i++) {
+            const memberId = voiceChannnelMembers[i];
+            if (!excludeMemberIds.includes(memberId)) {
+                includeMemberMentions.push(`<@${memberId}>`);
+            }
+        }
+        if (includeMemberMentions.length < 1) {
+            const embed = errorEmbed(
+                "グループ分けの対象メンバーが1人未満です。`exclude`オプションを変更してください。"
+            );
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        }
+
         // メンバー数をできる限り揃えるために調整
         const groupSize =
-            memberMentions.length /
-            Math.ceil(memberMentions.length / maxGroupSize);
+            includeMemberMentions.length /
+            Math.ceil(includeMemberMentions.length / maxGroupSize);
         const groups =
-            memberMentions.length >= groupSize
-                ? grouping(memberMentions, groupSize)
-                : [[...memberMentions]];
+            includeMemberMentions.length >= groupSize
+                ? grouping(includeMemberMentions, groupSize)
+                : [[...includeMemberMentions]];
 
         const embed = new EmbedBuilder()
             .setTitle("グループ分けの結果")

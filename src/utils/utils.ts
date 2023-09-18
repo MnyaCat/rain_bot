@@ -1,16 +1,19 @@
 import {
+    ButtonInteraction,
     ChatInputCommandInteraction,
     GuildMember,
     VoiceBasedChannel,
 } from "discord.js";
 import {
+    CommandOptionFetchFailedError,
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
 } from "../errors";
 import { errorEmbed } from "./embed_builder";
+import { RandomCommandOptions } from "../commands/random";
 
 export async function getExecutedMember(
-    interaction: ChatInputCommandInteraction
+    interaction: ChatInputCommandInteraction | ButtonInteraction
 ): Promise<GuildMember> {
     const member =
         interaction.member instanceof GuildMember
@@ -27,8 +30,8 @@ export async function getExecutedMember(
     }
 }
 
-export async function getMemberVoiceChannel(
-    interaction: ChatInputCommandInteraction
+export async function getVoiceChannel(
+    interaction: ChatInputCommandInteraction | ButtonInteraction
 ): Promise<VoiceBasedChannel> {
     const member = await getExecutedMember(interaction);
     const voiceChannel = member.voice.channel;
@@ -41,4 +44,31 @@ export async function getMemberVoiceChannel(
     } else {
         return voiceChannel;
     }
+}
+
+export async function getVoiceChannelMembers({
+    interaction,
+    includeBot = false,
+}: {
+    interaction: ChatInputCommandInteraction | ButtonInteraction;
+    includeBot?: boolean;
+}): Promise<GuildMember[]> {
+    const voiceChannel = await getVoiceChannel(interaction);
+    if (includeBot) {
+        return [...voiceChannel.members.values()];
+    } else {
+        return [...voiceChannel.members.values()].filter(
+            (member) => !member.user.bot
+        );
+    }
+}
+
+export async function getRandomCommandOptions(interaction: ButtonInteraction) {
+    const optionsJson = interaction.message.embeds[0].footer?.text;
+    if (optionsJson == undefined) {
+        const embed = errorEmbed("オプションが取得できませんでした。");
+        interaction.reply({ embeds: [embed] });
+        throw new CommandOptionFetchFailedError();
+    }
+    return JSON.parse(optionsJson) as RandomCommandOptions;
 }

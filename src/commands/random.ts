@@ -2,20 +2,30 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command, container } from "@sapphire/framework";
 import {
     APIApplicationCommandOptionChoice,
+    ActionRowBuilder,
+    BaseMessageOptions,
+    ButtonBuilder,
+    ButtonInteraction,
+    ButtonStyle,
     EmbedBuilder,
-    VoiceBasedChannel,
+    GuildMember,
+    time,
 } from "discord.js";
-import { getMemberVoiceChannel } from "../utils/utils";
-import { MemberVoiceChannelNotFoundError } from "../errors";
+import { getVoiceChannelMembers } from "../utils/utils";
+import {
+    MemberVoiceChannelNotFoundError,
+    WeaponNotFoundError,
+} from "../errors";
 import { errorEmbed } from "../utils/embed_builder";
+import {
+    SpecialWeapon,
+    SubWeapon,
+    Weapon,
+} from "../../prisma/generated/splatoon_client";
+import { rerollButtonIds, weaponCategoryName } from "../constants";
 
 const commandId = process.env.RANDOM_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
-
-function getRandomWeapon<T>(weapons: Array<T>): T {
-    const index = Math.floor(Math.random() * weapons.length);
-    return weapons[index];
-}
 
 @ApplyOptions<Command.Options>({
     name: "random",
@@ -28,23 +38,15 @@ export class UserCommand extends Command {
         registry: Command.Registry
     ) {
         const prisma = container.database;
-        const subWeapons = await prisma.subWeapon.findMany();
-        const subWeaponChoices = subWeapons.map(
-            (value: { id: number; name: string; seasonId: number }) => {
-                return {
-                    name: value.name,
-                    value: value.id,
-                } as APIApplicationCommandOptionChoice<number>;
-            }
+        const subWeaponChoices = generateChoices(
+            await prisma.subWeapon.findMany()
         );
-        const specialWeapons = await prisma.specialWeapon.findMany();
-        const specialWeaponChoices = specialWeapons.map(
-            (value: { id: number; name: string; seasonId: number }) => {
-                return {
-                    name: value.name,
-                    value: value.id,
-                } as APIApplicationCommandOptionChoice<number>;
-            }
+        const specialWeaponChoices = generateChoices(
+            await prisma.specialWeapon.findMany()
+        );
+        const seasonChoices = generateChoices(await prisma.season.findMany());
+        const weaponTypeChoices = generateChoices(
+            await prisma.weaponType.findMany()
         );
         registry.registerChatInputCommand(
             (builder) =>
@@ -59,19 +61,35 @@ export class UserCommand extends Command {
                             )
                             .addNumberOption((option) =>
                                 option
-                                    .setName("sub_filter")
+                                    .setName("sub")
                                     .setDescription(
-                                        "サブウェポンのフィルター。指定したサブウェポンのブキから選ばれます。"
+                                        "ブキをサブウェポンで絞り込みます。"
                                     )
                                     .addChoices(...subWeaponChoices)
                             )
                             .addNumberOption((option) =>
                                 option
-                                    .setName("special_filter")
+                                    .setName("special")
                                     .setDescription(
-                                        "スペシャルウェポンのフィルター。指定したスペシャルウェポンのブキから選ばれます。"
+                                        "ブキをスペシャルウェポンで絞り込みます。"
                                     )
                                     .addChoices(...specialWeaponChoices)
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setDescription(
+                                        "ブキを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("weapontype")
+                                    .setDescription(
+                                        "ブキをタイプで絞り込みます。"
+                                    )
+                                    .addChoices(...weaponTypeChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
@@ -115,92 +133,319 @@ export class UserCommand extends Command {
             | "subweapon"
             | "specialweapon";
         const single = interaction.options.getBoolean("single") ?? false;
-        const subId = interaction.options.getNumber("sub_filter") ?? undefined;
-        const specialId =
-            interaction.options.getNumber("special_filter") ?? undefined;
-        const prisma = container.database;
+        const subWeaponId = interaction.options.getNumber("sub") ?? undefined;
+        const specialWeaponId =
+            interaction.options.getNumber("special") ?? undefined;
+        const seasonId = interaction.options.getNumber("season") ?? undefined;
+        const weaponTypeId =
+            interaction.options.getNumber("weapontype") ?? undefined;
 
-        const asyncWeapons = async () => {
-            switch (subCommand) {
-                case "weapon": {
-                    return prisma.weapon.findMany({
-                        where: {
-                            subWeaponId: subId,
-                            specialWeaponId: specialId,
-                        },
-                    });
-                }
-                case "subweapon": {
-                    return prisma.subWeapon.findMany();
-                }
-                case "specialweapon": {
-                    return prisma.specialWeapon.findMany();
-                }
-            }
+        const options = {
+            subCommand,
+            subWeaponId,
+            specialWeaponId,
+            seasonId,
+            weaponTypeId,
+            single,
         };
-        const weapons = await asyncWeapons();
-        if (subCommand === "weapon" && weapons.length < 1) {
-            const subWeapon = await prisma.subWeapon.findFirst({
-                where: { id: subId },
-            });
-            const subFilter =
-                subWeapon != null ? `\nサブウェポン: ${subWeapon.name}` : "";
-            const specialWeapon = await prisma.specialWeapon.findFirst({
-                where: { id: specialId },
-            });
-            const specialFilter =
-                specialWeapon != null
-                    ? `\nスペシャルウェポン: ${specialWeapon.name}`
-                    : "";
-            const embed = errorEmbed(
-                `以下の条件に合うブキがありません。${subFilter}${specialFilter}`
-            );
-            return interaction.reply({ embeds: [embed] });
-        }
 
-        const weaponCategory = new Map([
-            ["weapon", "ブキ"],
-            ["subweapon", "サブウェポン"],
-            ["specialweapon", "スペシャルウェポン"],
-        ]).get(subCommand);
-        const fotterText = `sub_filter: ${subId}, special_filter: ${specialId}, single: ${single}`;
-
-        const embed = new EmbedBuilder()
-            .setTitle(`ランダムな${weaponCategory}を支給します！`)
-            .setFooter({ text: fotterText });
-
-        if (single) {
-            const randomWeapon = getRandomWeapon(weapons) as {
-                id: number;
-                name: string;
-                seasonId: number;
-            };
-            embed.setDescription(randomWeapon.name);
-        } else {
-            let voiceChannel: VoiceBasedChannel;
+        const replyOptions = await (() => {
             try {
-                voiceChannel = await getMemberVoiceChannel(interaction);
+                switch (subCommand) {
+                    case "weapon":
+                        return UserCommand.buildRandomWeaponResult({
+                            interaction,
+                            options,
+                        });
+                    case "subweapon":
+                        return UserCommand.buildRandomSubWeaponResult({
+                            interaction,
+                            options,
+                        });
+                    case "specialweapon":
+                        return UserCommand.buildRandomSpecialWeaponResult({
+                            interaction,
+                            options,
+                        });
+                }
             } catch (error) {
-                if (error instanceof MemberVoiceChannelNotFoundError) {
+                if (
+                    error instanceof MemberVoiceChannelNotFoundError ||
+                    error instanceof WeaponNotFoundError
+                ) {
                     return;
                 } else {
                     throw error;
                 }
             }
-            const memberMentions = voiceChannel.members.map(
-                (member) => `<@${member.id}>`
-            );
-            const results = [];
-            for (let i = 0; i < memberMentions.length; i++) {
-                const weapon = getRandomWeapon(weapons) as {
-                    id: number;
-                    name: string;
-                    seasonId: number;
-                };
-                results.push(`${memberMentions[i]}: ${weapon.name}`);
-            }
-            embed.setDescription(results.join("\n"));
+        })();
+
+        if (replyOptions != undefined) {
+            return interaction.reply(replyOptions);
         }
-        return interaction.reply({ embeds: [embed] });
     }
+
+    public static async buildRandomWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const weapons = await prisma.weapon.findMany({
+            where: {
+                subWeaponId: options.subWeaponId,
+                specialWeaponId: options.specialWeaponId,
+                seasonId: options.seasonId,
+                weaponTypeId: options.weaponTypeId,
+            },
+        });
+        const weaponCategory = weaponCategoryName.weapon;
+
+        if (weapons.length < 1) {
+            const embed = await generateNotFoundErrorEmbed(options);
+            interaction.reply({ embeds: [embed], ephemeral: true });
+            throw new WeaponNotFoundError();
+        }
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const weapon = getRandomWeapon(weapons);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.weapon);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomSubWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const weapons = await prisma.subWeapon.findMany();
+        const weaponCategory = weaponCategoryName.subWeapon;
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const weapon = getRandomWeapon(weapons);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.subWeapon);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomSpecialWeaponResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const weapons = await prisma.specialWeapon.findMany();
+        const weaponCategory = weaponCategoryName.specialWeapon;
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const weapon = getRandomWeapon(weapons);
+            embed = generateSingleResultEmbed({
+                weapon,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+}
+
+function generateChoices(
+    weapons: {
+        id: number;
+        name: string;
+    }[]
+) {
+    return weapons.map((weapon) => {
+        return {
+            name: weapon.name,
+            value: weapon.id,
+        } as APIApplicationCommandOptionChoice<number>;
+    });
+}
+
+export interface RandomCommandOptions {
+    subWeaponId?: number;
+    specialWeaponId?: number;
+    seasonId?: number;
+    weaponTypeId?: number;
+    single: boolean;
+}
+
+function getRandomWeapon(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
+    id: number;
+    name: string;
+    seasonId: number;
+} {
+    const index = Math.floor(Math.random() * weapons.length);
+    return weapons[index];
+}
+
+async function generateNotFoundErrorEmbed(options: RandomCommandOptions) {
+    const subWeaponId = options.subWeaponId;
+    const specialWeaponId = options.specialWeaponId;
+    const seasonId = options.seasonId;
+    const weaponTypeId = options.weaponTypeId;
+
+    const prisma = container.database;
+    const filters = [
+        await prisma.subWeapon.findFirst({
+            where: { id: subWeaponId },
+        }),
+        await prisma.specialWeapon.findFirst({
+            where: { id: specialWeaponId },
+        }),
+        await prisma.season.findFirst({ where: { id: seasonId } }),
+        await prisma.weaponType.findFirst({
+            where: { id: weaponTypeId },
+        }),
+    ];
+    const filterNames = [
+        "サブウェポン",
+        "スペシャルウェポン",
+        "シーズン",
+        "ブキタイプ",
+    ];
+
+    const filtersTexts = [];
+    for (let i = 0; i < filters.length; i++) {
+        const filter = filters[i];
+        const filterName = filterNames[i];
+        if (filter != null) {
+            filtersTexts.push(`- ${filterName}: ${filter.name}`);
+        }
+    }
+
+    return errorEmbed(
+        "以下の条件に合うブキがありません。\n\n" + filtersTexts.join("\n")
+    );
+}
+
+function generateSingleResultEmbed({
+    weapon,
+    weaponCategory,
+    options,
+    timestamp,
+}: {
+    weapon: Weapon | SubWeapon | SpecialWeapon;
+    weaponCategory: string;
+    options: RandomCommandOptions;
+    timestamp?: boolean;
+}) {
+    const fotterText = JSON.stringify(options);
+    let description = weapon.name;
+    if (timestamp) {
+        description += `\n更新: ${time(new Date(), "T")}`;
+    }
+    const embed = new EmbedBuilder()
+        .setTitle(`ランダムな${weaponCategory}を支給します！`)
+        .setDescription(description)
+        .setFooter({ text: fotterText });
+    return embed;
+}
+
+function generateResultEmbed({
+    members,
+    weapons,
+    weaponCategory,
+    options,
+    timestamp = false,
+}: {
+    members: GuildMember[];
+    weapons: Weapon[] | SubWeapon[] | SpecialWeapon[];
+    weaponCategory: string;
+    options: RandomCommandOptions;
+    timestamp?: boolean;
+}) {
+    const results: string[] = [];
+    for (let i = 0; i < members.length; i++) {
+        const member = members[i];
+        const weapon = getRandomWeapon(weapons);
+        const mention = `<@${member.id}>`;
+        results.push(`${mention}: ${weapon.name}`);
+    }
+    let description = results.join("\n");
+    if (timestamp) {
+        description += `\n更新: ${time(new Date(), "T")}`;
+    }
+    const fotterText = JSON.stringify(options);
+    const embed = new EmbedBuilder()
+        .setTitle(`ランダムな${weaponCategory}を支給します！`)
+        .setDescription(description)
+        .setFooter({ text: fotterText });
+    return embed;
+}
+
+function buildRerollActionRow(customId: string) {
+    const rerollButton = new ButtonBuilder()
+        .setCustomId(customId)
+        .setLabel("再ロール")
+        .setStyle(ButtonStyle.Primary);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(rerollButton);
 }

@@ -18,3 +18,19 @@ export class MemberVoiceChannelNotFoundError extends Error {
         Object.setPrototypeOf(this, MemberVoiceChannelNotFoundError.prototype);
     }
 }
+
+export class WeaponNotFoundError extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "There is no buki that meets the requirements.");
+        this.name = "WeaponNotFoundError";
+        Object.setPrototypeOf(this, WeaponNotFoundError.prototype);
+    }
+}
+
+export class CommandOptionFetchFailedError extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "Failed to fetch command options.");
+        this.name = "CommandOptionFetchFailedError";
+        Object.setPrototypeOf(this, CommandOptionFetchFailedError.prototype);
+    }
+}
