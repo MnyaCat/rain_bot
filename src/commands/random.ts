@@ -221,7 +221,7 @@ export class UserCommand extends Command {
                 timestamp: timestamp,
             });
         } else {
-            const members = await getVoiceChannelMembers(interaction);
+            const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
                 weapons,
@@ -260,7 +260,7 @@ export class UserCommand extends Command {
                 timestamp: timestamp,
             });
         } else {
-            const members = await getVoiceChannelMembers(interaction);
+            const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
                 weapons,
@@ -299,7 +299,7 @@ export class UserCommand extends Command {
                 timestamp: timestamp,
             });
         } else {
-            const members = await getVoiceChannelMembers(interaction);
+            const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
                 weapons,
