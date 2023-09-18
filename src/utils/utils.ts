@@ -51,7 +51,7 @@ export async function getVoiceChannelMembers({
     includeBot = false,
 }: {
     interaction: ChatInputCommandInteraction | ButtonInteraction;
-    includeBot: boolean;
+    includeBot?: boolean;
 }): Promise<GuildMember[]> {
     const voiceChannel = await getVoiceChannel(interaction);
     if (includeBot) {
