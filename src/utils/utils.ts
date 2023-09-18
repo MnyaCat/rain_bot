@@ -46,11 +46,21 @@ export async function getVoiceChannel(
     }
 }
 
-export async function getVoiceChannelMembers(
-    interaction: ChatInputCommandInteraction | ButtonInteraction
-): Promise<GuildMember[]> {
+export async function getVoiceChannelMembers({
+    interaction,
+    includeBot = false,
+}: {
+    interaction: ChatInputCommandInteraction | ButtonInteraction;
+    includeBot: boolean;
+}): Promise<GuildMember[]> {
     const voiceChannel = await getVoiceChannel(interaction);
-    return [...voiceChannel.members.values()];
+    if (includeBot) {
+        return [...voiceChannel.members.values()];
+    } else {
+        return [...voiceChannel.members.values()].filter(
+            (member) => !member.user.bot
+        );
+    }
 }
 
 export async function getRandomCommandOptions(interaction: ButtonInteraction) {
