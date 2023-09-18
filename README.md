@@ -8,8 +8,8 @@ Minecraftサーバー「Amethyst」の管理、スプラトゥーン3のサー�
 
 ### 1. スプラトゥーン3のグループ分け、プライベートマッチの支援
 
-[`grouping`コマンド](./commands.md/#grouping)で、参加しているボイスチャンネルのメンバーをいくつかのグループに分けられます。
-また、[`randomコマンド`](./commands.md/#random-weapon)で、ランダムなブキ/サブウェポン/スペシャルウェポンを支給できます。プライベートマッチなどでお使いください。
+[groupingコマンド](./document/commands.md/#grouping)で、参加しているボイスチャンネルのメンバーをいくつかのグループに分けられます。
+また、[random weaponsコマンド](./document/commands.md/#random-weapon)で、ランダムなブキを支給できます。プライベートマッチなどでお使いください。
 
 ### 2. Minecraft Server Amethystの管理
 
