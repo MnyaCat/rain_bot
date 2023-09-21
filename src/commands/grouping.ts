@@ -81,19 +81,7 @@ export class GroupingCommand extends Command {
             ...exclude.matchAll(/<@!?(?<id>\d{17,20})>/g),
         ].map((value) => value[1]);
 
-        let voiceChannel: VoiceBasedChannel;
-        try {
-            voiceChannel = await getVoiceChannel(interaction);
-        } catch (error) {
-            if (error instanceof GuildMemberNotFoundError) {
-                return;
-            } else if (error instanceof MemberVoiceChannelNotFoundError) {
-                return;
-            } else {
-                throw error;
-            }
-        }
-
+        const voiceChannel = await getVoiceChannel(interaction);
         const voiceChannnelMembers = voiceChannel.members.map(
             (member) => member.id
         );

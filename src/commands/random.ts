@@ -16,7 +16,6 @@ import {
     MemberVoiceChannelNotFoundError,
     WeaponNotFoundError,
 } from "../errors";
-import { errorEmbed } from "../utils/embed_builder";
 import {
     SpecialWeapon,
     SubWeapon,
@@ -150,33 +149,22 @@ export class UserCommand extends Command {
         };
 
         const replyOptions = await (() => {
-            try {
-                switch (subCommand) {
-                    case "weapon":
-                        return UserCommand.buildRandomWeaponResult({
-                            interaction,
-                            options,
-                        });
-                    case "subweapon":
-                        return UserCommand.buildRandomSubWeaponResult({
-                            interaction,
-                            options,
-                        });
-                    case "specialweapon":
-                        return UserCommand.buildRandomSpecialWeaponResult({
-                            interaction,
-                            options,
-                        });
-                }
-            } catch (error) {
-                if (
-                    error instanceof MemberVoiceChannelNotFoundError ||
-                    error instanceof WeaponNotFoundError
-                ) {
-                    return;
-                } else {
-                    throw error;
-                }
+            switch (subCommand) {
+                case "weapon":
+                    return UserCommand.buildRandomWeaponResult({
+                        interaction,
+                        options,
+                    });
+                case "subweapon":
+                    return UserCommand.buildRandomSubWeaponResult({
+                        interaction,
+                        options,
+                    });
+                case "specialweapon":
+                    return UserCommand.buildRandomSpecialWeaponResult({
+                        interaction,
+                        options,
+                    });
             }
         })();
 
@@ -206,8 +194,6 @@ export class UserCommand extends Command {
         const weaponCategory = weaponCategoryName.weapon;
 
         if (weapons.length < 1) {
-            const embed = await generateNotFoundErrorEmbed(options);
-            interaction.reply({ embeds: [embed], ephemeral: true });
             throw new WeaponNotFoundError();
         }
 
@@ -345,46 +331,6 @@ function getRandomWeapon(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
 } {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
-}
-
-async function generateNotFoundErrorEmbed(options: RandomCommandOptions) {
-    const subWeaponId = options.subWeaponId;
-    const specialWeaponId = options.specialWeaponId;
-    const seasonId = options.seasonId;
-    const weaponTypeId = options.weaponTypeId;
-
-    const prisma = container.database;
-    const filters = [
-        await prisma.subWeapon.findFirst({
-            where: { id: subWeaponId },
-        }),
-        await prisma.specialWeapon.findFirst({
-            where: { id: specialWeaponId },
-        }),
-        await prisma.season.findFirst({ where: { id: seasonId } }),
-        await prisma.weaponType.findFirst({
-            where: { id: weaponTypeId },
-        }),
-    ];
-    const filterNames = [
-        "サブウェポン",
-        "スペシャルウェポン",
-        "シーズン",
-        "ブキタイプ",
-    ];
-
-    const filtersTexts = [];
-    for (let i = 0; i < filters.length; i++) {
-        const filter = filters[i];
-        const filterName = filterNames[i];
-        if (filter != null) {
-            filtersTexts.push(`- ${filterName}: ${filter.name}`);
-        }
-    }
-
-    return errorEmbed(
-        "以下の条件に合うブキがありません。\n\n" + filtersTexts.join("\n")
-    );
 }
 
 function generateSingleResultEmbed({
