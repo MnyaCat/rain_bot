@@ -10,7 +10,6 @@ export class ChatInputCommandDenied extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {
         super(context, {
             ...options,
-            once: true,
             event: Events.ChatInputCommandDenied,
         });
     }
