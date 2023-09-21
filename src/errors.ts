@@ -1,6 +1,6 @@
 export class RainBotBaseError extends Error {}
 
-export class GuildMemberNotFoundError extends Error {
+export class GuildMemberNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
         super(message ?? "Failed to retrieve GuildMember");
         this.name = "GuildMemberNotFoundError";
@@ -8,7 +8,7 @@ export class GuildMemberNotFoundError extends Error {
     }
 }
 
-export class MemberVoiceChannelNotFoundError extends Error {
+export class MemberVoiceChannelNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
         super(
             message ??
