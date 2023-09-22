@@ -8,6 +8,7 @@ import {
     CommandOptionFetchFailedError,
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
+    MemberVoiceChannelNotJoining,
 } from "../errors";
 import { RandomCommandOptions } from "../commands/random";
 
@@ -51,6 +52,13 @@ export async function getVoiceChannelMembers({
         return [...voiceChannel.members.values()].filter(
             (member) => !member.user.bot
         );
+    }
+}
+
+export function checkVoiceChannelJoining(member: GuildMember) {
+    const channel = member?.voice.channel;
+    if (!channel) {
+        throw new MemberVoiceChannelNotJoining();
     }
 }
 

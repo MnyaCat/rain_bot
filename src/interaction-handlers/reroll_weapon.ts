@@ -6,13 +6,19 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { UserCommand } from "../commands/random";
-import { getRandomCommandOptions } from "../utils/utils";
+import {
+    checkVoiceChannelJoining,
+    getExecutedMember,
+    getRandomCommandOptions,
+} from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
 })
 export class ButtonHandler extends InteractionHandler {
     public async run(interaction: ButtonInteraction) {
+        const member = await getExecutedMember(interaction);
+        checkVoiceChannelJoining(member);
         const options = await getRandomCommandOptions(interaction);
         const replyOptions = await UserCommand.buildRandomWeaponResult({
             interaction,

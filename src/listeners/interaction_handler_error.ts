@@ -4,6 +4,7 @@ import {
     CommandOptionFetchFailedError,
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
+    MemberVoiceChannelNotJoining,
 } from "../errors";
 import { ButtonInteraction } from "discord.js";
 
@@ -21,6 +22,10 @@ export class InteractionHandlerErrorListener extends Listener {
                 if (error instanceof GuildMemberNotFoundError) {
                     return errorEmbed(
                         "実行したユーザーの情報が取得できませんでした。"
+                    );
+                } else if (error instanceof MemberVoiceChannelNotJoining) {
+                    return errorEmbed(
+                        "実行したサーバーでボイスチャンネルに参加している状態で実行してください。"
                     );
                 } else if (error instanceof MemberVoiceChannelNotFoundError) {
                     return errorEmbed(

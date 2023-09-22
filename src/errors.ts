@@ -8,6 +8,14 @@ export class GuildMemberNotFoundError extends RainBotBaseError {
     }
 }
 
+export class MemberVoiceChannelNotJoining extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "Member is not participating in the voice channel.");
+        this.name = "MemberVoiceChannelNotJoining";
+        Object.setPrototypeOf(this, MemberVoiceChannelNotJoining.prototype);
+    }
+}
+
 export class MemberVoiceChannelNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
         super(
