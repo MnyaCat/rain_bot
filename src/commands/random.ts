@@ -345,14 +345,13 @@ function generateSingleResultEmbed({
     timestamp?: boolean;
 }) {
     const fotterText = JSON.stringify(options);
-    let description = weapon.name;
-    if (timestamp) {
-        description += `\n更新: ${time(new Date(), "T")}`;
-    }
     const embed = new EmbedBuilder()
         .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(description)
+        .setDescription(weapon.name)
         .setFooter({ text: fotterText });
+    if (timestamp) {
+        embed.setTimestamp(new Date());
+    }
     return embed;
 }
 
@@ -376,15 +375,14 @@ function generateResultEmbed({
         const mention = `<@${member.id}>`;
         results.push(`${mention}: ${weapon.name}`);
     }
-    let description = results.join("\n");
-    if (timestamp) {
-        description += `\n更新: ${time(new Date(), "T")}`;
-    }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
         .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(description)
+        .setDescription(results.join("\n"))
         .setFooter({ text: fotterText });
+    if (timestamp) {
+        embed.setTimestamp(new Date());
+    }
     return embed;
 }
 
