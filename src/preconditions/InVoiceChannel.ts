@@ -33,7 +33,7 @@ export class UserPrecondition extends Precondition {
             ? this.ok()
             : this.error({
                   message:
-                      "このコマンドは、実行したサーバーと同じボイスチャンネルに参加している時のみ実行できます。",
+                      "このコマンドは、ボイスチャンネルに参加している時のみ実行できます。",
               });
     }
 }
