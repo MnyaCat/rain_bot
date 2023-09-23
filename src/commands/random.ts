@@ -9,13 +9,9 @@ import {
     ButtonStyle,
     EmbedBuilder,
     GuildMember,
-    time,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
-import {
-    MemberVoiceChannelNotFoundError,
-    WeaponNotFoundError,
-} from "../errors";
+import { WeaponNotFoundError } from "../errors";
 import {
     SpecialWeapon,
     SubWeapon,

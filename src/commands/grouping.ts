@@ -1,12 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
-import { EmbedBuilder, VoiceBasedChannel } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { getVoiceChannel } from "../utils/utils";
-import {
-    GuildMemberNotFoundError,
-    MemberVoiceChannelNotFoundError,
-} from "../errors";
 
 const commandId = process.env.GROUPING_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
