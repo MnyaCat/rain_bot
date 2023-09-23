@@ -34,7 +34,6 @@ package-lock.json
 !.env.vault
 
 # Prisma
-prisma/migrations
 prisma/generated
 dev.db
 prisma-script.ts
