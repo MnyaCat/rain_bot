@@ -140,7 +140,6 @@ export class UserCommand extends Command {
             interaction.options.getNumber("weapontype") ?? undefined;
 
         const options = {
-            subCommand,
             subWeaponId,
             specialWeaponId,
             seasonId,
@@ -199,13 +198,13 @@ export class UserCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const weapon = getRandomElement(weapons);
+            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
+            .setDescription(weapon.name)
+            .setFooter({text: JSON.stringify(options)})
+            if (timestamp) {
+                embed.setTimestamp(new Date())
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
@@ -238,13 +237,13 @@ export class UserCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const weapon = getRandomElement(weapons);
+            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
+            .setDescription(weapon.name)
+            .setFooter({text: JSON.stringify(options)})
+            if (timestamp) {
+                embed.setTimestamp(new Date())
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
@@ -277,13 +276,13 @@ export class UserCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const weapon = getRandomElement(weapons);
+            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
+            .setDescription(weapon.name)
+            .setFooter({text: JSON.stringify(options)})
+            if (timestamp) {
+                embed.setTimestamp(new Date())
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
@@ -302,6 +301,14 @@ export class UserCommand extends Command {
     }
 }
 
+export interface RandomCommandOptions {
+    subWeaponId?: number;
+    specialWeaponId?: number;
+    seasonId?: number;
+    weaponTypeId?: number;
+    single: boolean;
+}
+
 function generateChoices(
     weapons: {
         id: number;
@@ -316,43 +323,13 @@ function generateChoices(
     });
 }
 
-export interface RandomCommandOptions {
-    subWeaponId?: number;
-    specialWeaponId?: number;
-    seasonId?: number;
-    weaponTypeId?: number;
-    single: boolean;
-}
-
-function getRandomWeapon(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
+function getRandomElement(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
     id: number;
     name: string;
     seasonId: number;
 } {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
-}
-
-function generateSingleResultEmbed({
-    weapon,
-    weaponCategory,
-    options,
-    timestamp,
-}: {
-    weapon: Weapon | SubWeapon | SpecialWeapon;
-    weaponCategory: string;
-    options: RandomCommandOptions;
-    timestamp?: boolean;
-}) {
-    const fotterText = JSON.stringify(options);
-    const embed = new EmbedBuilder()
-        .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(weapon.name)
-        .setFooter({ text: fotterText });
-    if (timestamp) {
-        embed.setTimestamp(new Date());
-    }
-    return embed;
 }
 
 function generateResultEmbed({
@@ -371,9 +348,9 @@ function generateResultEmbed({
     const results: string[] = [];
     for (let i = 0; i < members.length; i++) {
         const member = members[i];
-        const weapon = getRandomWeapon(weapons);
+        const weapon = getRandomElement(weapons);
         const mention = `<@${member.id}>`;
-        results.push(`${mention}: ${weapon.name}`);
+        results.push(`- ${mention}: ${weapon.name}`);
     }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
