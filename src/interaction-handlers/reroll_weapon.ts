@@ -5,7 +5,7 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { UserCommand } from "../commands/random";
+import { RandomCommand } from "../commands/random";
 import {
     checkVoiceChannelJoining,
     getExecutedMember,
@@ -20,7 +20,7 @@ export class ButtonHandler extends InteractionHandler {
         const member = await getExecutedMember(interaction);
         checkVoiceChannelJoining(member);
         const options = await getRandomCommandOptions(interaction);
-        const replyOptions = await UserCommand.buildRandomWeaponResult({
+        const replyOptions = await RandomCommand.buildRandomWeaponResult({
             interaction,
             options,
             timestamp: true,

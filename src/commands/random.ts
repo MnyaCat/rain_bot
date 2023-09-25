@@ -9,13 +9,9 @@ import {
     ButtonStyle,
     EmbedBuilder,
     GuildMember,
-    time,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
-import {
-    MemberVoiceChannelNotFoundError,
-    WeaponNotFoundError,
-} from "../errors";
+import { WeaponNotFoundError } from "../errors";
 import {
     SpecialWeapon,
     SubWeapon,
@@ -32,7 +28,7 @@ const idHints = commandId != undefined ? [commandId] : undefined;
         "ランダムなブキ/サブウェポン/スペシャルウェポンを支給します。ボイスチャンネルに参加している時のみ実行できます。",
     preconditions: ["InVoiceChannel"],
 })
-export class UserCommand extends Command {
+export class RandomCommand extends Command {
     public override async registerApplicationCommands(
         registry: Command.Registry
     ) {
@@ -150,17 +146,17 @@ export class UserCommand extends Command {
         const replyOptions = await (() => {
             switch (subCommand) {
                 case "weapon":
-                    return UserCommand.buildRandomWeaponResult({
+                    return RandomCommand.buildRandomWeaponResult({
                         interaction,
                         options,
                     });
                 case "subweapon":
-                    return UserCommand.buildRandomSubWeaponResult({
+                    return RandomCommand.buildRandomSubWeaponResult({
                         interaction,
                         options,
                     });
                 case "specialweapon":
-                    return UserCommand.buildRandomSpecialWeaponResult({
+                    return RandomCommand.buildRandomSpecialWeaponResult({
                         interaction,
                         options,
                     });
