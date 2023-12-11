@@ -25,7 +25,7 @@ const idHints = commandId != undefined ? [commandId] : undefined;
 @ApplyOptions<Command.Options>({
     name: "random",
     description:
-        "ランダムなブキ/サブウェポン/スペシャルウェポンを支給します。ボイスチャンネルに参加している時のみ実行できます。",
+        "ランダムなブキ/サブウェポン/スペシャルウェポン/ブキタイプ/ルール/ステージを抽選します。ボイスチャンネルに参加している時のみ実行できます。",
     preconditions: ["InVoiceChannel"],
 })
 export class RandomCommand extends Command {
@@ -52,7 +52,7 @@ export class RandomCommand extends Command {
                         builder
                             .setName("weapon")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
                             .addNumberOption((option) =>
                                 option
@@ -89,31 +89,56 @@ export class RandomCommand extends Command {
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("subweapon")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなサブを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなサブを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("specialweapon")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなスペシャルウェポンを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなスペシャルウェポンを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setDescription("1つのみ抽選するか。")
+                            )
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("weapontype")
+                            .setDescription(
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキタイプを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("rule")
+                            .setDescription("ランダムなルールを抽選します。")
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("stage")
+                            .setDescription("ランダムなステージを抽選します。")
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setDescription(
+                                        "ステージを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                     ),
             { idHints: idHints }
@@ -126,7 +151,10 @@ export class RandomCommand extends Command {
         const subCommand = interaction.options.getSubcommand() as
             | "weapon"
             | "subweapon"
-            | "specialweapon";
+            | "specialweapon"
+            | "weapontype"
+            | "rule"
+            | "stage";
         const single = interaction.options.getBoolean("single") ?? false;
         const subWeaponId = interaction.options.getNumber("sub") ?? undefined;
         const specialWeaponId =
@@ -143,6 +171,7 @@ export class RandomCommand extends Command {
             single,
         };
 
+        // TODO: 各コマンドに必要なだけのオプションを渡す(=RandomCommandOptionsを使わない)
         const replyOptions = await (() => {
             switch (subCommand) {
                 case "weapon":
@@ -160,6 +189,12 @@ export class RandomCommand extends Command {
                         interaction,
                         options,
                     });
+                case "weapontype":
+                    return RandomCommand.buildRandomWeaponTypeResult();
+                case "rule":
+                    return RandomCommand.buildRandomRuleResult();
+                case "stage":
+                    return RandomCommand.buildRandomStageResult();
             }
         })();
 
@@ -195,11 +230,12 @@ export class RandomCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomElement(weapons);
-            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
-            .setDescription(weapon.name)
-            .setFooter({text: JSON.stringify(options)})
+            embed = new EmbedBuilder()
+                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setDescription(weapon.name)
+                .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
-                embed.setTimestamp(new Date())
+                embed.setTimestamp(new Date());
             }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
@@ -234,11 +270,12 @@ export class RandomCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomElement(weapons);
-            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
-            .setDescription(weapon.name)
-            .setFooter({text: JSON.stringify(options)})
+            embed = new EmbedBuilder()
+                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setDescription(weapon.name)
+                .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
-                embed.setTimestamp(new Date())
+                embed.setTimestamp(new Date());
             }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
@@ -273,11 +310,12 @@ export class RandomCommand extends Command {
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomElement(weapons);
-            embed = new EmbedBuilder().setTitle(`ランダムな${weaponCategory}を支給します！`)
-            .setDescription(weapon.name)
-            .setFooter({text: JSON.stringify(options)})
+            embed = new EmbedBuilder()
+                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setDescription(weapon.name)
+                .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
-                embed.setTimestamp(new Date())
+                embed.setTimestamp(new Date());
             }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
@@ -350,7 +388,7 @@ function generateResultEmbed({
     }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
-        .setTitle(`ランダムな${weaponCategory}を支給します！`)
+        .setTitle(`${weaponCategory}の抽選結果です！`)
         .setDescription(results.join("\n"))
         .setFooter({ text: fotterText });
     if (timestamp) {
