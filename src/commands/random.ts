@@ -47,16 +47,22 @@ export class RandomCommand extends Command {
             (builder) =>
                 builder
                     .setName(this.name)
+                    .setNameLocalization("ja", "ランダム")
                     .setDescription(this.description)
                     .addSubcommand((builder) =>
                         builder
                             .setName("weapon")
+                            .setNameLocalization("ja", "ブキ")
                             .setDescription(
                                 "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
                             .addNumberOption((option) =>
                                 option
                                     .setName("sub")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "サブウェポンのフィルター"
+                                    )
                                     .setDescription(
                                         "ブキをサブウェポンで絞り込みます。"
                                     )
@@ -65,6 +71,10 @@ export class RandomCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("special")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "スペシャルウェポンのフィルター"
+                                    )
                                     .setDescription(
                                         "ブキをスペシャルウェポンで絞り込みます。"
                                     )
@@ -73,6 +83,10 @@ export class RandomCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンのフィルター"
+                                    )
                                     .setDescription(
                                         "ブキを実装されたシーズンで絞り込みます。"
                                     )
@@ -81,6 +95,10 @@ export class RandomCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("weapontype")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "ブキタイプのフィルター"
+                                    )
                                     .setDescription(
                                         "ブキをタイプで絞り込みます。"
                                     )
@@ -89,36 +107,75 @@ export class RandomCommand extends Command {
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
                                     .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("subweapon")
+                            .setNameLocalization("ja", "サブウェポン")
                             .setDescription(
                                 "ボイスチャンネルのメンバーの数、もしくは1つのランダムなサブを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンのフィルター"
+                                    )
+                                    .setDescription(
+                                        "ステージを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
                                     .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("specialweapon")
+                            .setNameLocalization("ja", "スペシャルウェポン")
                             .setDescription(
                                 "ボイスチャンネルのメンバーの数、もしくは1つのランダムなスペシャルウェポンを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンのフィルター"
+                                    )
+                                    .setDescription(
+                                        "ステージを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
                                     .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("weapontype")
+                            .setNameLocalization("ja", "ブキタイプ")
                             .setDescription(
                                 "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキタイプを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
@@ -126,15 +183,21 @@ export class RandomCommand extends Command {
                     .addSubcommand((builder) =>
                         builder
                             .setName("rule")
+                            .setNameLocalization("ja", "ルール")
                             .setDescription("ランダムなルールを抽選します。")
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("stage")
+                            .setNameLocalization("ja", "ステージ")
                             .setDescription("ランダムなステージを抽選します。")
                             .addNumberOption((option) =>
                                 option
                                     .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンのフィルター"
+                                    )
                                     .setDescription(
                                         "ステージを実装されたシーズンで絞り込みます。"
                                     )
