@@ -349,6 +349,10 @@ export class RandomCommand extends Command {
         });
         const randomCategory = randomCategoryName.subWeapon;
 
+        if (weapons.length < 1) {
+            throw new WeaponNotFoundError();
+        }
+
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomElement(weapons);
@@ -392,6 +396,10 @@ export class RandomCommand extends Command {
             },
         });
         const randomCategory = randomCategoryName.specialWeapon;
+
+        if (specialWeapons.length < 1) {
+            throw new WeaponNotFoundError();
+        }
 
         let embed: EmbedBuilder;
         if (options.single) {
@@ -497,6 +505,10 @@ export class RandomCommand extends Command {
             },
         });
         const randomCategory = randomCategoryName.stage;
+
+        if (stages.length < 1) {
+            throw new WeaponNotFoundError();
+        }
 
         const stage = getRandomElement(stages);
         const embed = new EmbedBuilder()
