@@ -382,6 +382,46 @@ export class RandomCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
+        const specialWeapons = await prisma.specialWeapon.findMany();
+        const weaponCategory = randomCategoryName.specialWeapon;
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const specialWeapon = getRandomElement(specialWeapons);
+            embed = new EmbedBuilder()
+                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setDescription(specialWeapon.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons: specialWeapons,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomWeaponTypeResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
         const weaponTypes = await prisma.weaponType.findMany();
         const weaponCategory = randomCategoryName.weaponType;
 
@@ -406,46 +446,6 @@ export class RandomCommand extends Command {
             });
         }
         const row = buildRerollActionRow(rerollButtonIds.weaponType);
-        return {
-            embeds: [embed],
-            components: [row],
-        } as BaseMessageOptions;
-    }
-
-    public static async buildRandomWeaponTypeResult({
-        interaction,
-        options,
-        timestamp = false,
-    }: {
-        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
-        options: RandomCommandOptions;
-        timestamp?: boolean;
-    }) {
-        const prisma = container.database;
-        const weapons = await prisma.specialWeapon.findMany();
-        const weaponCategory = randomCategoryName.specialWeapon;
-
-        let embed: EmbedBuilder;
-        if (options.single) {
-            const weapon = getRandomElement(weapons);
-            embed = new EmbedBuilder()
-                .setTitle(`${weaponCategory}の抽選結果です！`)
-                .setDescription(weapon.name)
-                .setFooter({ text: JSON.stringify(options) });
-            if (timestamp) {
-                embed.setTimestamp(new Date());
-            }
-        } else {
-            const members = await getVoiceChannelMembers({ interaction });
-            embed = generateResultEmbed({
-                members,
-                weapons,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
-        }
-        const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
         return {
             embeds: [embed],
             components: [row],
