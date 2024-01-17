@@ -16,8 +16,9 @@ import {
     SpecialWeapon,
     SubWeapon,
     Weapon,
+    WeaponType,
 } from "../../prisma/generated/splatoon_client";
-import { rerollButtonIds, weaponCategoryName } from "../constants";
+import { rerollButtonIds, randomCategoryName } from "../constants";
 
 const commandId = process.env.RANDOM_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
@@ -179,6 +180,15 @@ export class RandomCommand extends Command {
                             .setDescription(
                                 "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキタイプを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
+                            .addBooleanOption((option) =>
+                                option
+                                    .setName("single")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
+                                    .setDescription("1つのみ抽選するか。")
+                            )
                     )
                     .addSubcommand((builder) =>
                         builder
@@ -253,7 +263,10 @@ export class RandomCommand extends Command {
                         options,
                     });
                 case "weapontype":
-                    return RandomCommand.buildRandomWeaponTypeResult();
+                    return RandomCommand.buildRandomWeaponTypeResult({
+                        interaction,
+                        options,
+                    });
                 case "rule":
                     return RandomCommand.buildRandomRuleResult();
                 case "stage":
@@ -284,7 +297,7 @@ export class RandomCommand extends Command {
                 weaponTypeId: options.weaponTypeId,
             },
         });
-        const weaponCategory = weaponCategoryName.weapon;
+        const weaponCategory = randomCategoryName.weapon;
 
         if (weapons.length < 1) {
             throw new WeaponNotFoundError();
@@ -328,7 +341,7 @@ export class RandomCommand extends Command {
     }) {
         const prisma = container.database;
         const weapons = await prisma.subWeapon.findMany();
-        const weaponCategory = weaponCategoryName.subWeapon;
+        const weaponCategory = randomCategoryName.subWeapon;
 
         let embed: EmbedBuilder;
         if (options.single) {
@@ -367,8 +380,48 @@ export class RandomCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
+        const weaponTypes = await prisma.weaponType.findMany();
+        const weaponCategory = randomCategoryName.weaponType;
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const weaponType = getRandomElement(weaponTypes);
+            embed = new EmbedBuilder()
+                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setDescription(weaponType.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons: weaponTypes,
+                weaponCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.weaponType);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomWeaponTypeResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
         const weapons = await prisma.specialWeapon.findMany();
-        const weaponCategory = weaponCategoryName.specialWeapon;
+        const weaponCategory = randomCategoryName.specialWeapon;
 
         let embed: EmbedBuilder;
         if (options.single) {
@@ -420,16 +473,16 @@ function generateChoices(
     });
 }
 
-function getRandomElement(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
-    id: number;
-    name: string;
-    seasonId: number;
-} {
+function getRandomElement<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
+>(weapons: T[]): T {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
 }
 
-function generateResultEmbed({
+function generateResultEmbed<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
+>({
     members,
     weapons,
     weaponCategory,
@@ -437,7 +490,7 @@ function generateResultEmbed({
     timestamp = false,
 }: {
     members: GuildMember[];
-    weapons: Weapon[] | SubWeapon[] | SpecialWeapon[];
+    weapons: T[];
     weaponCategory: string;
     options: RandomCommandOptions;
     timestamp?: boolean;
