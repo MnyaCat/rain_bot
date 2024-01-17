@@ -270,7 +270,9 @@ export class RandomCommand extends Command {
                 case "rule":
                     return RandomCommand.buildRandomRuleResult({});
                 case "stage":
-                    return RandomCommand.buildRandomStageResult();
+                    return RandomCommand.buildRandomStageResult({
+                        options,
+                    });
             }
         })();
 
@@ -467,6 +469,36 @@ export class RandomCommand extends Command {
             embed.setTimestamp(new Date());
         }
         const row = buildRerollActionRow(rerollButtonIds.rule);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomStageResult({
+        options,
+        timestamp = false,
+    }: {
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const stages = await prisma.stage.findMany({
+            where: {
+                seasonId: options.seasonId,
+            },
+        });
+        const randomCategory = randomCategoryName.stage;
+
+        const stage = getRandomElement(stages);
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            .setDescription(stage.name)
+            .setFooter({ text: JSON.stringify(options) });
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+        const row = buildRerollActionRow(rerollButtonIds.stage);
         return {
             embeds: [embed],
             components: [row],
