@@ -342,20 +342,20 @@ export class RandomCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
-        const weapons = await prisma.subWeapon.findMany({
+        const subWeapons = await prisma.subWeapon.findMany({
             where: {
                 seasonId: options.seasonId,
             },
         });
         const randomCategory = randomCategoryName.subWeapon;
 
-        if (weapons.length < 1) {
+        if (subWeapons.length < 1) {
             throw new WeaponNotFoundError();
         }
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomElement(weapons);
+            const weapon = getRandomElement(subWeapons);
             embed = new EmbedBuilder()
                 .setTitle(`${randomCategory}の抽選結果です！`)
                 .setDescription(weapon.name)
@@ -367,7 +367,7 @@ export class RandomCommand extends Command {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
-                weapons,
+                weapons: subWeapons,
                 randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
