@@ -268,7 +268,7 @@ export class RandomCommand extends Command {
                         options,
                     });
                 case "rule":
-                    return RandomCommand.buildRandomRuleResult();
+                    return RandomCommand.buildRandomRuleResult({});
                 case "stage":
                     return RandomCommand.buildRandomStageResult();
             }
@@ -444,6 +444,29 @@ export class RandomCommand extends Command {
             });
         }
         const row = buildRerollActionRow(rerollButtonIds.specialWeapon);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomRuleResult({
+        timestamp = false,
+    }: {
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const rules = await prisma.rule.findMany();
+        const randomCategory = randomCategoryName.rule;
+
+        const rule = getRandomElement(rules);
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            .setDescription(rule.name);
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+        const row = buildRerollActionRow(rerollButtonIds.rule);
         return {
             embeds: [embed],
             components: [row],
