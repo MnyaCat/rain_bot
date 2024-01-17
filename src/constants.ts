@@ -5,6 +5,9 @@ export const rerollButtonIds = {
     mainWeapon: "reroll-mainweapon",
     subWeapon: "reroll-subweapon",
     specialWeapon: "reroll-specialweapon",
+    weaponType: "reroll-weapontype",
+    rule: "reroll-rule",
+    stage: "reroll-stage",
 };
 export const randomCategoryName = {
     weapon: "ブキ",
