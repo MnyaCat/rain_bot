@@ -299,7 +299,7 @@ export class RandomCommand extends Command {
                 weaponTypeId: options.weaponTypeId,
             },
         });
-        const weaponCategory = randomCategoryName.weapon;
+        const randomCategory = randomCategoryName.weapon;
 
         if (weapons.length < 1) {
             throw new WeaponNotFoundError();
@@ -309,7 +309,7 @@ export class RandomCommand extends Command {
         if (options.single) {
             const weapon = getRandomElement(weapons);
             embed = new EmbedBuilder()
-                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setTitle(`${randomCategory}の抽選結果です！`)
                 .setDescription(weapon.name)
                 .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
@@ -320,7 +320,7 @@ export class RandomCommand extends Command {
             embed = generateResultEmbed({
                 members,
                 weapons,
-                weaponCategory,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -347,13 +347,13 @@ export class RandomCommand extends Command {
                 seasonId: options.seasonId,
             },
         });
-        const weaponCategory = randomCategoryName.subWeapon;
+        const randomCategory = randomCategoryName.subWeapon;
 
         let embed: EmbedBuilder;
         if (options.single) {
             const weapon = getRandomElement(weapons);
             embed = new EmbedBuilder()
-                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setTitle(`${randomCategory}の抽選結果です！`)
                 .setDescription(weapon.name)
                 .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
@@ -364,7 +364,7 @@ export class RandomCommand extends Command {
             embed = generateResultEmbed({
                 members,
                 weapons,
-                weaponCategory,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -391,13 +391,13 @@ export class RandomCommand extends Command {
                 seasonId: options.seasonId,
             },
         });
-        const weaponCategory = randomCategoryName.specialWeapon;
+        const randomCategory = randomCategoryName.specialWeapon;
 
         let embed: EmbedBuilder;
         if (options.single) {
             const specialWeapon = getRandomElement(specialWeapons);
             embed = new EmbedBuilder()
-                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setTitle(`${randomCategory}の抽選結果です！`)
                 .setDescription(specialWeapon.name)
                 .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
@@ -408,7 +408,7 @@ export class RandomCommand extends Command {
             embed = generateResultEmbed({
                 members,
                 weapons: specialWeapons,
-                weaponCategory,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -431,13 +431,13 @@ export class RandomCommand extends Command {
     }) {
         const prisma = container.database;
         const weaponTypes = await prisma.weaponType.findMany();
-        const weaponCategory = randomCategoryName.weaponType;
+        const randomCategory = randomCategoryName.weaponType;
 
         let embed: EmbedBuilder;
         if (options.single) {
             const weaponType = getRandomElement(weaponTypes);
             embed = new EmbedBuilder()
-                .setTitle(`${weaponCategory}の抽選結果です！`)
+                .setTitle(`${randomCategory}の抽選結果です！`)
                 .setDescription(weaponType.name)
                 .setFooter({ text: JSON.stringify(options) });
             if (timestamp) {
@@ -448,7 +448,7 @@ export class RandomCommand extends Command {
             embed = generateResultEmbed({
                 members,
                 weapons: weaponTypes,
-                weaponCategory,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -548,13 +548,13 @@ function generateResultEmbed<
 >({
     members,
     weapons,
-    weaponCategory,
+    randomCategory: random,
     options,
     timestamp = false,
 }: {
     members: GuildMember[];
     weapons: T[];
-    weaponCategory: string;
+    randomCategory: string;
     options: RandomCommandOptions;
     timestamp?: boolean;
 }) {
@@ -567,7 +567,7 @@ function generateResultEmbed<
     }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
-        .setTitle(`${weaponCategory}の抽選結果です！`)
+        .setTitle(`${random}の抽選結果です！`)
         .setDescription(results.join("\n"))
         .setFooter({ text: fotterText });
     if (timestamp) {
