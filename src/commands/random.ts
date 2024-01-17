@@ -342,7 +342,11 @@ export class RandomCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
-        const weapons = await prisma.subWeapon.findMany();
+        const weapons = await prisma.subWeapon.findMany({
+            where: {
+                seasonId: options.seasonId,
+            },
+        });
         const weaponCategory = randomCategoryName.subWeapon;
 
         let embed: EmbedBuilder;
