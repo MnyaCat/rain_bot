@@ -11,7 +11,7 @@ import {
     GuildMember,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
-import { WeaponNotFoundError } from "../errors";
+import { ItemNotFoundError } from "../errors";
 import {
     SpecialWeapon,
     SubWeapon,
@@ -302,7 +302,7 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.weapon;
 
         if (weapons.length < 1) {
-            throw new WeaponNotFoundError();
+            throw new ItemNotFoundError();
         }
 
         let embed: EmbedBuilder;
@@ -350,7 +350,7 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.subWeapon;
 
         if (subWeapons.length < 1) {
-            throw new WeaponNotFoundError();
+            throw new ItemNotFoundError();
         }
 
         let embed: EmbedBuilder;
@@ -398,7 +398,7 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.specialWeapon;
 
         if (specialWeapons.length < 1) {
-            throw new WeaponNotFoundError();
+            throw new ItemNotFoundError();
         }
 
         let embed: EmbedBuilder;
@@ -507,7 +507,7 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.stage;
 
         if (stages.length < 1) {
-            throw new WeaponNotFoundError();
+            throw new ItemNotFoundError();
         }
 
         const stage = getRandomElement(stages);

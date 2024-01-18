@@ -5,12 +5,12 @@ import {
 } from "@sapphire/framework";
 import {
     errorEmbed,
-    generateWeaponNotFoundErrorEmbed,
+    generateItemNotFoundErrorEmbed,
 } from "../utils/embed_builder";
 import {
     GuildMemberNotFoundError,
     MemberVoiceChannelNotFoundError,
-    WeaponNotFoundError,
+    ItemNotFoundError,
 } from "../errors";
 
 export class ChatInputCommandErrorListener extends Listener {
@@ -52,8 +52,8 @@ export class ChatInputCommandErrorListener extends Listener {
                 return errorEmbed(
                     "ボイスチャンネルの情報が取得できませんでした。実行したサーバーでボイスチャンネルに参加しているか確かめてください。"
                 );
-            } else if (error instanceof WeaponNotFoundError) {
-                return generateWeaponNotFoundErrorEmbed(randomCommandOptions);
+            } else if (error instanceof ItemNotFoundError) {
+                return generateItemNotFoundErrorEmbed(randomCommandOptions);
             } else if (error instanceof Error) {
                 return errorEmbed(`throw: ${error.message}`);
             } else {
