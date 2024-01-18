@@ -27,18 +27,36 @@ export async function generateWeaponNotFoundErrorEmbed(
     const weaponTypeId = options.weaponTypeId;
 
     const prisma = container.database;
+    const subWeaponFilter =
+        subWeaponId != null
+            ? await prisma.subWeapon.findFirst({
+                  where: { id: subWeaponId },
+              })
+            : null;
+    const specialWeaponFilter =
+        specialWeaponId != null
+            ? await prisma.specialWeapon.findFirst({
+                  where: { id: specialWeaponId },
+              })
+            : null;
+    const seasonFilter =
+        seasonId != null
+            ? await prisma.season.findFirst({ where: { id: seasonId } })
+            : null;
+    const weaponTypeFilter =
+        weaponTypeId != null
+            ? await prisma.weaponType.findFirst({
+                  where: { id: weaponTypeId },
+              })
+            : null;
+
     const filters = [
-        await prisma.subWeapon.findFirst({
-            where: { id: subWeaponId },
-        }),
-        await prisma.specialWeapon.findFirst({
-            where: { id: specialWeaponId },
-        }),
-        await prisma.season.findFirst({ where: { id: seasonId } }),
-        await prisma.weaponType.findFirst({
-            where: { id: weaponTypeId },
-        }),
+        subWeaponFilter,
+        specialWeaponFilter,
+        seasonFilter,
+        weaponTypeFilter,
     ];
+
     const filterNames = [
         "サブウェポン",
         "スペシャルウェポン",
