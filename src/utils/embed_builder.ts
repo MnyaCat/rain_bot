@@ -18,7 +18,7 @@ export function mcEmbed() {
     });
 }
 
-export async function generateWeaponNotFoundErrorEmbed(
+export async function generateItemNotFoundErrorEmbed(
     options: RandomCommandOptions
 ) {
     const subWeaponId = options.subWeaponId;
@@ -74,6 +74,6 @@ export async function generateWeaponNotFoundErrorEmbed(
     }
 
     return errorEmbed(
-        "以下の条件に合うブキがありません。\n\n" + filtersTexts.join("\n")
+        "以下の条件に合うアイテムがありません。\n\n" + filtersTexts.join("\n")
     );
 }
