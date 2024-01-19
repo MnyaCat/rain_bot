@@ -1,5 +1,5 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
+import { Command, container } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder } from "discord.js";
 import { getVoiceChannel } from "../utils/utils";
@@ -79,6 +79,9 @@ export class GroupingCommand extends Command {
             interaction.options.getString("additional-member") ?? "";
         const exclude = interaction.options.getString("exclude-member") ?? "";
 
+        const lastGroupingResults = container.lastGroupingResults;
+        console.log(lastGroupingResults);
+
         if (maxGroupSize < 2) {
             const embed = errorEmbed(
                 "`groupsize`に入力された数値が範囲外です。2以上の値を入力してください。"
@@ -97,7 +100,7 @@ export class GroupingCommand extends Command {
         const voiceChannnelMembers = voiceChannel.members
             .map((member) => member.id)
             .concat(additionalMemberIds);
-        const includeMemberMentions = [];
+        const includeMemberMentions: string[] = [];
         for (let i = 0; i < voiceChannnelMembers.length; i++) {
             const memberId = voiceChannnelMembers[i];
             if (!excludeMemberIds.includes(memberId)) {
@@ -115,10 +118,32 @@ export class GroupingCommand extends Command {
         const groupSize =
             includeMemberMentions.length /
             Math.ceil(includeMemberMentions.length / maxGroupSize);
-        const groups =
-            includeMemberMentions.length >= groupSize
-                ? grouping(includeMemberMentions, groupSize)
-                : [[...includeMemberMentions]];
+
+        let loopLimitReached = false;
+
+        const groups = (() => {
+            if (includeMemberMentions.length > groupSize) {
+                let groups = grouping(includeMemberMentions, groupSize);
+                if (lastGroupingResults != undefined) {
+                    const loopLimit = 10;
+                    let count = 0;
+                    while (
+                        this.groupingResultEqual(lastGroupingResults, groups) &&
+                        count < loopLimit
+                    ) {
+                        groups = grouping(includeMemberMentions, groupSize);
+                        count += 1;
+                    }
+
+                    if (count >= loopLimit) {
+                        loopLimitReached = true;
+                    }
+                }
+                return groups;
+            } else {
+                return [[...includeMemberMentions]];
+            }
+        })();
 
         const embed = new EmbedBuilder()
             .setTitle("グループ分けの結果")
@@ -130,6 +155,21 @@ export class GroupingCommand extends Command {
             });
         }
 
+        if (loopLimitReached) {
+            embed.setDescription(
+                "注意: 最大ループ回数に達したため、前回と同じグループ分けの結果となりました。"
+            );
+        }
+
+        container.lastGroupingResults = groups;
+
         return interaction.reply({ embeds: [embed] });
+    }
+
+    private groupingResultEqual(result1: string[][], result2: string[][]) {
+        return (
+            JSON.stringify([...result1].map((item) => item.sort()).sort()) ===
+            JSON.stringify([...result2].map((item) => item.sort()).sort())
+        );
     }
 }
