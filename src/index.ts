@@ -45,6 +45,7 @@ export class RainClient extends SapphireClient {
 declare module "@sapphire/pieces" {
     interface Container {
         database: PrismaClient;
+        lastGroupingResults: string[][] | undefined;
     }
 }
 
