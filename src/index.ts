@@ -16,8 +16,6 @@ envs.forEach((value, key) => {
     }
 });
 
-import "./mc_listener";
-
 export class RainClient extends SapphireClient {
     public constructor() {
         super({
