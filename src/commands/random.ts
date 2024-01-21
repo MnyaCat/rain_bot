@@ -62,7 +62,7 @@ export class RandomCommand extends Command {
                                     .setName("sub")
                                     .setNameLocalization(
                                         "ja",
-                                        "サブウェポンのフィルター"
+                                        "サブウェポンで絞り込む"
                                     )
                                     .setDescription(
                                         "ブキをサブウェポンで絞り込みます。"
@@ -74,7 +74,7 @@ export class RandomCommand extends Command {
                                     .setName("special")
                                     .setNameLocalization(
                                         "ja",
-                                        "スペシャルウェポンのフィルター"
+                                        "スペシャルウェポンで絞り込む"
                                     )
                                     .setDescription(
                                         "ブキをスペシャルウェポンで絞り込みます。"
@@ -86,7 +86,7 @@ export class RandomCommand extends Command {
                                     .setName("season")
                                     .setNameLocalization(
                                         "ja",
-                                        "シーズンのフィルター"
+                                        "シーズンで絞り込む"
                                     )
                                     .setDescription(
                                         "ブキを実装されたシーズンで絞り込みます。"
@@ -98,10 +98,10 @@ export class RandomCommand extends Command {
                                     .setName("weapontype")
                                     .setNameLocalization(
                                         "ja",
-                                        "ブキタイプのフィルター"
+                                        "ブキタイプで絞り込む"
                                     )
                                     .setDescription(
-                                        "ブキをタイプで絞り込みます。"
+                                        "ブキをブキタイプで絞り込みます。"
                                     )
                                     .addChoices(...weaponTypeChoices)
                             )
@@ -127,10 +127,10 @@ export class RandomCommand extends Command {
                                     .setName("season")
                                     .setNameLocalization(
                                         "ja",
-                                        "シーズンのフィルター"
+                                        "シーズンで絞り込む"
                                     )
                                     .setDescription(
-                                        "ステージを実装されたシーズンで絞り込みます。"
+                                        "サブウェポンを実装されたシーズンで絞り込みます。"
                                     )
                                     .addChoices(...seasonChoices)
                             )
@@ -156,10 +156,10 @@ export class RandomCommand extends Command {
                                     .setName("season")
                                     .setNameLocalization(
                                         "ja",
-                                        "シーズンのフィルター"
+                                        "シーズンで絞り込む"
                                     )
                                     .setDescription(
-                                        "ステージを実装されたシーズンで絞り込みます。"
+                                        "スペシャルウェポンを実装されたシーズンで絞り込みます。"
                                     )
                                     .addChoices(...seasonChoices)
                             )
@@ -206,7 +206,7 @@ export class RandomCommand extends Command {
                                     .setName("season")
                                     .setNameLocalization(
                                         "ja",
-                                        "シーズンのフィルター"
+                                        "シーズンで絞り込む"
                                     )
                                     .setDescription(
                                         "ステージを実装されたシーズンで絞り込みます。"
