@@ -1,6 +1,6 @@
 export class RainBotBaseError extends Error {}
 
-export class GuildMemberNotFoundError extends Error {
+export class GuildMemberNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
         super(message ?? "Failed to retrieve GuildMember");
         this.name = "GuildMemberNotFoundError";
@@ -8,7 +8,15 @@ export class GuildMemberNotFoundError extends Error {
     }
 }
 
-export class MemberVoiceChannelNotFoundError extends Error {
+export class MemberVoiceChannelNotJoining extends RainBotBaseError {
+    constructor(message?: string) {
+        super(message ?? "Member is not participating in the voice channel.");
+        this.name = "MemberVoiceChannelNotJoining";
+        Object.setPrototypeOf(this, MemberVoiceChannelNotJoining.prototype);
+    }
+}
+
+export class MemberVoiceChannelNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
         super(
             message ??
@@ -19,11 +27,11 @@ export class MemberVoiceChannelNotFoundError extends Error {
     }
 }
 
-export class WeaponNotFoundError extends RainBotBaseError {
+export class ItemNotFoundError extends RainBotBaseError {
     constructor(message?: string) {
-        super(message ?? "There is no buki that meets the requirements.");
+        super(message ?? "There is no item that meets the requirements.");
         this.name = "WeaponNotFoundError";
-        Object.setPrototypeOf(this, WeaponNotFoundError.prototype);
+        Object.setPrototypeOf(this, ItemNotFoundError.prototype);
     }
 }
 

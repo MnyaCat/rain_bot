@@ -9,20 +9,16 @@ import {
     ButtonStyle,
     EmbedBuilder,
     GuildMember,
-    time,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
-import {
-    MemberVoiceChannelNotFoundError,
-    WeaponNotFoundError,
-} from "../errors";
-import { errorEmbed } from "../utils/embed_builder";
+import { ItemNotFoundError } from "../errors";
 import {
     SpecialWeapon,
     SubWeapon,
     Weapon,
+    WeaponType,
 } from "../../prisma/generated/splatoon_client";
-import { rerollButtonIds, weaponCategoryName } from "../constants";
+import { rerollButtonIds, randomCategoryName } from "../constants";
 
 const commandId = process.env.RANDOM_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
@@ -30,10 +26,10 @@ const idHints = commandId != undefined ? [commandId] : undefined;
 @ApplyOptions<Command.Options>({
     name: "random",
     description:
-        "ランダムなブキ/サブウェポン/スペシャルウェポンを支給します。ボイスチャンネルに参加している時のみ実行できます。",
+        "ランダムなブキ/サブウェポン/スペシャルウェポン/ブキタイプ/ルール/ステージを抽選します。ボイスチャンネルに参加している時のみ実行できます。",
     preconditions: ["InVoiceChannel"],
 })
-export class UserCommand extends Command {
+export class RandomCommand extends Command {
     public override async registerApplicationCommands(
         registry: Command.Registry
     ) {
@@ -52,16 +48,22 @@ export class UserCommand extends Command {
             (builder) =>
                 builder
                     .setName(this.name)
+                    .setNameLocalization("ja", "ランダム")
                     .setDescription(this.description)
                     .addSubcommand((builder) =>
                         builder
                             .setName("weapon")
+                            .setNameLocalization("ja", "ブキ")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
                             )
                             .addNumberOption((option) =>
                                 option
                                     .setName("sub")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "サブウェポンで絞り込む"
+                                    )
                                     .setDescription(
                                         "ブキをサブウェポンで絞り込みます。"
                                     )
@@ -70,6 +72,10 @@ export class UserCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("special")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "スペシャルウェポンで絞り込む"
+                                    )
                                     .setDescription(
                                         "ブキをスペシャルウェポンで絞り込みます。"
                                     )
@@ -78,6 +84,10 @@ export class UserCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンで絞り込む"
+                                    )
                                     .setDescription(
                                         "ブキを実装されたシーズンで絞り込みます。"
                                     )
@@ -86,39 +96,122 @@ export class UserCommand extends Command {
                             .addNumberOption((option) =>
                                 option
                                     .setName("weapontype")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "ブキタイプで絞り込む"
+                                    )
                                     .setDescription(
-                                        "ブキをタイプで絞り込みます。"
+                                        "ブキをブキタイプで絞り込みます。"
                                     )
                                     .addChoices(...weaponTypeChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
+                                    .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("subweapon")
+                            .setNameLocalization("ja", "サブウェポン")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなサブを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなサブを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンで絞り込む"
+                                    )
+                                    .setDescription(
+                                        "サブウェポンを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
+                                    .setDescription("1つのみ抽選するか。")
                             )
                     )
                     .addSubcommand((builder) =>
                         builder
                             .setName("specialweapon")
+                            .setNameLocalization("ja", "スペシャルウェポン")
                             .setDescription(
-                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなスペシャルウェポンを支給します。ボイスチャンネルに参加している時のみ実行できます。"
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなスペシャルウェポンを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンで絞り込む"
+                                    )
+                                    .setDescription(
+                                        "スペシャルウェポンを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                             .addBooleanOption((option) =>
                                 option
                                     .setName("single")
-                                    .setDescription("1つのみ支給するか。")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
+                                    .setDescription("1つのみ抽選するか。")
+                            )
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("weapontype")
+                            .setNameLocalization("ja", "ブキタイプ")
+                            .setDescription(
+                                "ボイスチャンネルのメンバーの数、もしくは1つのランダムなブキタイプを抽選します。ボイスチャンネルに参加している時のみ実行できます。"
+                            )
+                            .addBooleanOption((option) =>
+                                option
+                                    .setName("single")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "1つのみ抽選する"
+                                    )
+                                    .setDescription("1つのみ抽選するか。")
+                            )
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("rule")
+                            .setNameLocalization("ja", "ルール")
+                            .setDescription("ランダムなルールを抽選します。")
+                    )
+                    .addSubcommand((builder) =>
+                        builder
+                            .setName("stage")
+                            .setNameLocalization("ja", "ステージ")
+                            .setDescription("ランダムなステージを抽選します。")
+                            .addNumberOption((option) =>
+                                option
+                                    .setName("season")
+                                    .setNameLocalization(
+                                        "ja",
+                                        "シーズンで絞り込む"
+                                    )
+                                    .setDescription(
+                                        "ステージを実装されたシーズンで絞り込みます。"
+                                    )
+                                    .addChoices(...seasonChoices)
                             )
                     ),
             { idHints: idHints }
@@ -131,7 +224,10 @@ export class UserCommand extends Command {
         const subCommand = interaction.options.getSubcommand() as
             | "weapon"
             | "subweapon"
-            | "specialweapon";
+            | "specialweapon"
+            | "weapontype"
+            | "rule"
+            | "stage";
         const single = interaction.options.getBoolean("single") ?? false;
         const subWeaponId = interaction.options.getNumber("sub") ?? undefined;
         const specialWeaponId =
@@ -141,7 +237,6 @@ export class UserCommand extends Command {
             interaction.options.getNumber("weapontype") ?? undefined;
 
         const options = {
-            subCommand,
             subWeaponId,
             specialWeaponId,
             seasonId,
@@ -149,34 +244,35 @@ export class UserCommand extends Command {
             single,
         };
 
+        // TODO: 各コマンドに必要なだけのオプションを渡す(=RandomCommandOptionsを使わない)
         const replyOptions = await (() => {
-            try {
-                switch (subCommand) {
-                    case "weapon":
-                        return UserCommand.buildRandomWeaponResult({
-                            interaction,
-                            options,
-                        });
-                    case "subweapon":
-                        return UserCommand.buildRandomSubWeaponResult({
-                            interaction,
-                            options,
-                        });
-                    case "specialweapon":
-                        return UserCommand.buildRandomSpecialWeaponResult({
-                            interaction,
-                            options,
-                        });
-                }
-            } catch (error) {
-                if (
-                    error instanceof MemberVoiceChannelNotFoundError ||
-                    error instanceof WeaponNotFoundError
-                ) {
-                    return;
-                } else {
-                    throw error;
-                }
+            switch (subCommand) {
+                case "weapon":
+                    return RandomCommand.buildRandomWeaponResult({
+                        interaction,
+                        options,
+                    });
+                case "subweapon":
+                    return RandomCommand.buildRandomSubWeaponResult({
+                        interaction,
+                        options,
+                    });
+                case "specialweapon":
+                    return RandomCommand.buildRandomSpecialWeaponResult({
+                        interaction,
+                        options,
+                    });
+                case "weapontype":
+                    return RandomCommand.buildRandomWeaponTypeResult({
+                        interaction,
+                        options,
+                    });
+                case "rule":
+                    return RandomCommand.buildRandomRuleResult({});
+                case "stage":
+                    return RandomCommand.buildRandomStageResult({
+                        options,
+                    });
             }
         })();
 
@@ -203,29 +299,28 @@ export class UserCommand extends Command {
                 weaponTypeId: options.weaponTypeId,
             },
         });
-        const weaponCategory = weaponCategoryName.weapon;
+        const randomCategory = randomCategoryName.weapon;
 
         if (weapons.length < 1) {
-            const embed = await generateNotFoundErrorEmbed(options);
-            interaction.reply({ embeds: [embed], ephemeral: true });
-            throw new WeaponNotFoundError();
+            throw new ItemNotFoundError();
         }
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const weapon = getRandomElement(weapons);
+            embed = new EmbedBuilder()
+                .setTitle(`${randomCategory}の抽選結果です！`)
+                .setDescription(weapon.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
                 weapons,
-                weaponCategory,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -247,24 +342,33 @@ export class UserCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
-        const weapons = await prisma.subWeapon.findMany();
-        const weaponCategory = weaponCategoryName.subWeapon;
+        const subWeapons = await prisma.subWeapon.findMany({
+            where: {
+                seasonId: options.seasonId,
+            },
+        });
+        const randomCategory = randomCategoryName.subWeapon;
+
+        if (subWeapons.length < 1) {
+            throw new ItemNotFoundError();
+        }
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const weapon = getRandomElement(subWeapons);
+            embed = new EmbedBuilder()
+                .setTitle(`${randomCategory}の抽選結果です！`)
+                .setDescription(weapon.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
-                weapons,
-                weaponCategory,
+                weapons: subWeapons,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -286,24 +390,33 @@ export class UserCommand extends Command {
         timestamp?: boolean;
     }) {
         const prisma = container.database;
-        const weapons = await prisma.specialWeapon.findMany();
-        const weaponCategory = weaponCategoryName.specialWeapon;
+        const specialWeapons = await prisma.specialWeapon.findMany({
+            where: {
+                seasonId: options.seasonId,
+            },
+        });
+        const randomCategory = randomCategoryName.specialWeapon;
+
+        if (specialWeapons.length < 1) {
+            throw new ItemNotFoundError();
+        }
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomWeapon(weapons);
-            embed = generateSingleResultEmbed({
-                weapon,
-                weaponCategory,
-                options,
-                timestamp: timestamp,
-            });
+            const specialWeapon = getRandomElement(specialWeapons);
+            embed = new EmbedBuilder()
+                .setTitle(`${randomCategory}の抽選結果です！`)
+                .setDescription(specialWeapon.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
         } else {
             const members = await getVoiceChannelMembers({ interaction });
             embed = generateResultEmbed({
                 members,
-                weapons,
-                weaponCategory,
+                weapons: specialWeapons,
+                randomCategory: randomCategory,
                 options,
                 timestamp: timestamp,
             });
@@ -314,6 +427,111 @@ export class UserCommand extends Command {
             components: [row],
         } as BaseMessageOptions;
     }
+
+    public static async buildRandomWeaponTypeResult({
+        interaction,
+        options,
+        timestamp = false,
+    }: {
+        interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const weaponTypes = await prisma.weaponType.findMany();
+        const randomCategory = randomCategoryName.weaponType;
+
+        let embed: EmbedBuilder;
+        if (options.single) {
+            const weaponType = getRandomElement(weaponTypes);
+            embed = new EmbedBuilder()
+                .setTitle(`${randomCategory}の抽選結果です！`)
+                .setDescription(weaponType.name)
+                .setFooter({ text: JSON.stringify(options) });
+            if (timestamp) {
+                embed.setTimestamp(new Date());
+            }
+        } else {
+            const members = await getVoiceChannelMembers({ interaction });
+            embed = generateResultEmbed({
+                members,
+                weapons: weaponTypes,
+                randomCategory: randomCategory,
+                options,
+                timestamp: timestamp,
+            });
+        }
+        const row = buildRerollActionRow(rerollButtonIds.weaponType);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomRuleResult({
+        timestamp = false,
+    }: {
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const rules = await prisma.rule.findMany();
+        const randomCategory = randomCategoryName.rule;
+
+        const rule = getRandomElement(rules);
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            .setDescription(rule.name);
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+        const row = buildRerollActionRow(rerollButtonIds.rule);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+
+    public static async buildRandomStageResult({
+        options,
+        timestamp = false,
+    }: {
+        options: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const prisma = container.database;
+        const stages = await prisma.stage.findMany({
+            where: {
+                seasonId: options.seasonId,
+            },
+        });
+        const randomCategory = randomCategoryName.stage;
+
+        if (stages.length < 1) {
+            throw new ItemNotFoundError();
+        }
+
+        const stage = getRandomElement(stages);
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            .setDescription(stage.name)
+            .setFooter({ text: JSON.stringify(options) });
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+        const row = buildRerollActionRow(rerollButtonIds.stage);
+        return {
+            embeds: [embed],
+            components: [row],
+        } as BaseMessageOptions;
+    }
+}
+
+export interface RandomCommandOptions {
+    subWeaponId?: number;
+    specialWeaponId?: number;
+    seasonId?: number;
+    weaponTypeId?: number;
+    single: boolean;
 }
 
 function generateChoices(
@@ -330,115 +548,43 @@ function generateChoices(
     });
 }
 
-export interface RandomCommandOptions {
-    subWeaponId?: number;
-    specialWeaponId?: number;
-    seasonId?: number;
-    weaponTypeId?: number;
-    single: boolean;
-}
-
-function getRandomWeapon(weapons: Weapon[] | SubWeapon[] | SpecialWeapon[]): {
-    id: number;
-    name: string;
-    seasonId: number;
-} {
+function getRandomElement<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
+>(weapons: T[]): T {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
 }
 
-async function generateNotFoundErrorEmbed(options: RandomCommandOptions) {
-    const subWeaponId = options.subWeaponId;
-    const specialWeaponId = options.specialWeaponId;
-    const seasonId = options.seasonId;
-    const weaponTypeId = options.weaponTypeId;
-
-    const prisma = container.database;
-    const filters = [
-        await prisma.subWeapon.findFirst({
-            where: { id: subWeaponId },
-        }),
-        await prisma.specialWeapon.findFirst({
-            where: { id: specialWeaponId },
-        }),
-        await prisma.season.findFirst({ where: { id: seasonId } }),
-        await prisma.weaponType.findFirst({
-            where: { id: weaponTypeId },
-        }),
-    ];
-    const filterNames = [
-        "サブウェポン",
-        "スペシャルウェポン",
-        "シーズン",
-        "ブキタイプ",
-    ];
-
-    const filtersTexts = [];
-    for (let i = 0; i < filters.length; i++) {
-        const filter = filters[i];
-        const filterName = filterNames[i];
-        if (filter != null) {
-            filtersTexts.push(`- ${filterName}: ${filter.name}`);
-        }
-    }
-
-    return errorEmbed(
-        "以下の条件に合うブキがありません。\n\n" + filtersTexts.join("\n")
-    );
-}
-
-function generateSingleResultEmbed({
-    weapon,
-    weaponCategory,
-    options,
-    timestamp,
-}: {
-    weapon: Weapon | SubWeapon | SpecialWeapon;
-    weaponCategory: string;
-    options: RandomCommandOptions;
-    timestamp?: boolean;
-}) {
-    const fotterText = JSON.stringify(options);
-    let description = weapon.name;
-    if (timestamp) {
-        description += `\n更新: ${time(new Date(), "T")}`;
-    }
-    const embed = new EmbedBuilder()
-        .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(description)
-        .setFooter({ text: fotterText });
-    return embed;
-}
-
-function generateResultEmbed({
+function generateResultEmbed<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
+>({
     members,
     weapons,
-    weaponCategory,
+    randomCategory: random,
     options,
     timestamp = false,
 }: {
     members: GuildMember[];
-    weapons: Weapon[] | SubWeapon[] | SpecialWeapon[];
-    weaponCategory: string;
+    weapons: T[];
+    randomCategory: string;
     options: RandomCommandOptions;
     timestamp?: boolean;
 }) {
     const results: string[] = [];
     for (let i = 0; i < members.length; i++) {
         const member = members[i];
-        const weapon = getRandomWeapon(weapons);
+        const weapon = getRandomElement(weapons);
         const mention = `<@${member.id}>`;
-        results.push(`${mention}: ${weapon.name}`);
-    }
-    let description = results.join("\n");
-    if (timestamp) {
-        description += `\n更新: ${time(new Date(), "T")}`;
+        results.push(`- ${mention}: ${weapon.name}`);
     }
     const fotterText = JSON.stringify(options);
     const embed = new EmbedBuilder()
-        .setTitle(`ランダムな${weaponCategory}を支給します！`)
-        .setDescription(description)
+        .setTitle(`${random}の抽選結果です！`)
+        .setDescription(results.join("\n"))
         .setFooter({ text: fotterText });
+    if (timestamp) {
+        embed.setTimestamp(new Date());
+    }
     return embed;
 }
 

@@ -5,30 +5,28 @@ import {
 } from "@sapphire/framework";
 import { type ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommandOptions, UserCommand } from "../commands/random";
-import { getRandomCommandOptions } from "../utils/utils";
-import { CommandOptionFetchFailedError } from "../errors";
+import { RandomCommand } from "../commands/random";
+import {
+    checkVoiceChannelJoining,
+    getExecutedMember,
+    getRandomCommandOptions,
+} from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
 })
 export class ButtonHandler extends InteractionHandler {
     public async run(interaction: ButtonInteraction) {
-        let options: RandomCommandOptions;
-        try {
-            options = await getRandomCommandOptions(interaction);
-        } catch (error) {
-            if (error instanceof CommandOptionFetchFailedError) {
-                return;
-            } else {
-                throw error;
+        const member = await getExecutedMember(interaction);
+        checkVoiceChannelJoining(member);
+        const options = await getRandomCommandOptions(interaction);
+        const replyOptions = await RandomCommand.buildRandomSpecialWeaponResult(
+            {
+                interaction,
+                options,
+                timestamp: true,
             }
-        }
-        const replyOptions = await UserCommand.buildRandomSpecialWeaponResult({
-            interaction,
-            options,
-            timestamp: true,
-        });
+        );
         await interaction.update(replyOptions);
     }
 

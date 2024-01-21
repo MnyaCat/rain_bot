@@ -1,12 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
+import { Command, container } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
-import { EmbedBuilder, VoiceBasedChannel } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { getVoiceChannel } from "../utils/utils";
-import {
-    GuildMemberNotFoundError,
-    MemberVoiceChannelNotFoundError,
-} from "../errors";
 
 const commandId = process.env.GROUPING_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
@@ -45,17 +41,28 @@ export class GroupingCommand extends Command {
             (builder) =>
                 builder
                     .setName(this.name)
+                    .setNameLocalization("ja", "グルーピング")
                     .setDescription(this.description)
                     .addNumberOption((option) =>
                         option
                             .setName("groupsize")
+                            .setNameLocalization("ja", "グループサイズ")
                             .setDescription(
                                 "1つのグループに参加できる最大のユーザー数"
                             )
                     )
                     .addStringOption((option) =>
                         option
-                            .setName("exclude")
+                            .setName("additional-member")
+                            .setNameLocalization("ja", "追加するメンバー")
+                            .setDescription(
+                                "グループ分けの対象に追加するメンバー。メンションで指定してください。"
+                            )
+                    )
+                    .addStringOption((option) =>
+                        option
+                            .setName("exclude-member")
+                            .setNameLocalization("ja", "除外するメンバー")
                             .setDescription(
                                 "グループ分けの対象に含めないメンバー。メンションで指定してください。"
                             )
@@ -68,7 +75,12 @@ export class GroupingCommand extends Command {
         interaction: Command.ChatInputCommandInteraction
     ) {
         const maxGroupSize = interaction.options.getNumber("groupsize") ?? 4;
-        const exclude = interaction.options.getString("exclude") ?? "";
+        const additional =
+            interaction.options.getString("additional-member") ?? "";
+        const exclude = interaction.options.getString("exclude-member") ?? "";
+
+        const lastGroupingResults = container.lastGroupingResults;
+        console.log(lastGroupingResults);
 
         if (maxGroupSize < 2) {
             const embed = errorEmbed(
@@ -77,27 +89,18 @@ export class GroupingCommand extends Command {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
+        const additionalMemberIds = [
+            ...additional.matchAll(/<@!?(?<id>\d{17,20})>/g),
+        ].map((value) => value[1]);
         const excludeMemberIds = [
             ...exclude.matchAll(/<@!?(?<id>\d{17,20})>/g),
         ].map((value) => value[1]);
 
-        let voiceChannel: VoiceBasedChannel;
-        try {
-            voiceChannel = await getVoiceChannel(interaction);
-        } catch (error) {
-            if (error instanceof GuildMemberNotFoundError) {
-                return;
-            } else if (error instanceof MemberVoiceChannelNotFoundError) {
-                return;
-            } else {
-                throw error;
-            }
-        }
-
-        const voiceChannnelMembers = voiceChannel.members.map(
-            (member) => member.id
-        );
-        const includeMemberMentions = [];
+        const voiceChannel = await getVoiceChannel(interaction);
+        const voiceChannnelMembers = voiceChannel.members
+            .map((member) => member.id)
+            .concat(additionalMemberIds);
+        const includeMemberMentions: string[] = [];
         for (let i = 0; i < voiceChannnelMembers.length; i++) {
             const memberId = voiceChannnelMembers[i];
             if (!excludeMemberIds.includes(memberId)) {
@@ -111,14 +114,36 @@ export class GroupingCommand extends Command {
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
-        // メンバー数をできる限り揃えるために調整
+        // メンバー数をできる限り均等にするために調整
         const groupSize =
             includeMemberMentions.length /
             Math.ceil(includeMemberMentions.length / maxGroupSize);
-        const groups =
-            includeMemberMentions.length >= groupSize
-                ? grouping(includeMemberMentions, groupSize)
-                : [[...includeMemberMentions]];
+
+        let loopLimitReached = false;
+
+        const groups = (() => {
+            if (includeMemberMentions.length > groupSize) {
+                let groups = grouping(includeMemberMentions, groupSize);
+                if (lastGroupingResults != undefined) {
+                    const loopLimit = 10;
+                    let count = 0;
+                    while (
+                        this.groupingResultEqual(lastGroupingResults, groups) &&
+                        count < loopLimit
+                    ) {
+                        groups = grouping(includeMemberMentions, groupSize);
+                        count += 1;
+                    }
+
+                    if (count >= loopLimit) {
+                        loopLimitReached = true;
+                    }
+                }
+                return groups;
+            } else {
+                return [[...includeMemberMentions]];
+            }
+        })();
 
         const embed = new EmbedBuilder()
             .setTitle("グループ分けの結果")
@@ -130,6 +155,21 @@ export class GroupingCommand extends Command {
             });
         }
 
+        if (loopLimitReached) {
+            embed.setDescription(
+                "注意: 最大ループ回数に達したため、前回と同じグループ分けの結果となりました。"
+            );
+        }
+
+        container.lastGroupingResults = groups;
+
         return interaction.reply({ embeds: [embed] });
+    }
+
+    private groupingResultEqual(result1: string[][], result2: string[][]) {
+        return (
+            JSON.stringify([...result1].map((item) => item.sort()).sort()) ===
+            JSON.stringify([...result2].map((item) => item.sort()).sort())
+        );
     }
 }

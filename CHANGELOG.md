@@ -2,19 +2,37 @@
 
 Rain Botの変更履歴を記録する文書です。
 
-## [Unreleased]
+## 0.3.0 - 2024-01-22
 
 ### Added
 
-- [groupingコマンド](./document/commands.md/#grouping)に対象のメンバーを追加するオプションを追加
+- [random rule](./document/commands.md/#ランダム-ルール--random-rule)を追加
+- [random stage](./document/commands.md/#ランダム-ルール--random-rule)を追加
+- [random weapontype](./document/commands.md/#ランダム-ブキタイプ--random-weapontype)を追加
+- [grouping](./document/commands.md/#グルーピング--grouping)に対象のメンバーを追加する`additional-member`オプションを追加
+
+### Changed
+
+- [grouping](./document/commands.md/#グルーピング--grouping)は、前回とグループ分けの結果が同じ場合に最大10回までグループ分けをやり直すようになりました
+- コマンド名、オプション名に日本語のローカライズを追加しました
+- 一部のコマンドやオプションの説明を改善しました
+
+### Removed
+
+- Amethyst Serverの管理機能を削除しました
+
+### Fixed
+
+- [random subweapon](./document/commands.md/#ランダム-サブウェポン--random-subweapon)の`season`オプションが適応されていなかった問題を修正
+- [random specialweapon](./document/commands.md/#ランダム-スペシャルウェポン--random-specialweapon)の`season`オプションが適応されていなかった問題を修正
 
 ## 0.2.0 - 2023-09-18
 
 ### Added
 
-- [random weapon](./document/commands.md/#random-weapon)に実装されたシーズン、ブキタイプで絞り込むオプションを追加
-- [random weapon](./document/commands.md/#random-weapon)に再ロールボタンを追加
-- [groupingコマンド](./document/commands.md/#grouping)にメンバーを対象から外す`exlude`オプションを追加
+- [random weapon](./document/commands.md/#ランダム-ブキ--random-weapon)に実装されたシーズン、ブキタイプで絞り込むオプションを追加
+- [random weapon](./document/commands.md/#ランダム-ブキ--random-weapon)に再ロールボタンを追加
+- [grouping](./document/commands.md/#グルーピング--grouping)にメンバーを対象から外す`exlude`オプションを追加
 
 ### Changed
 

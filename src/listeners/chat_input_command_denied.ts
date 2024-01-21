@@ -6,11 +6,10 @@ import {
 } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 
-export class ChatInputCommandDenied extends Listener {
+export class ChatInputCommandDeniedListener extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {
         super(context, {
             ...options,
-            once: true,
             event: Events.ChatInputCommandDenied,
         });
     }

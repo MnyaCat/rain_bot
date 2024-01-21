@@ -20,7 +20,7 @@ export class ButtonHandler extends InteractionHandler {
         const member = await getExecutedMember(interaction);
         checkVoiceChannelJoining(member);
         const options = await getRandomCommandOptions(interaction);
-        const replyOptions = await RandomCommand.buildRandomSubWeaponResult({
+        const replyOptions = await RandomCommand.buildRandomWeaponTypeResult({
             interaction,
             options,
             timestamp: true,
@@ -29,7 +29,7 @@ export class ButtonHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ButtonInteraction) {
-        if (interaction.customId !== rerollButtonIds.subWeapon)
+        if (interaction.customId !== rerollButtonIds.weaponType)
             return this.none();
         return this.some();
     }
