@@ -12,9 +12,9 @@ Rain Botの変更履歴を記録する文書です。
 
 ### Added
 
-- [random weapon](./document/commands.md/#random-weapon)に実装されたシーズン、ブキタイプで絞り込むオプションを追加
-- [random weapon](./document/commands.md/#random-weapon)に再ロールボタンを追加
-- [groupingコマンド](./document/commands.md/#grouping)にメンバーを対象から外す`exlude`オプションを追加
+- [random weapon](./document/commands.md/#ランダム-ブキ--random-weapon)に実装されたシーズン、ブキタイプで絞り込むオプションを追加
+- [random weapon](./document/commands.md/#ランダム-ブキ--random-weapon)に再ロールボタンを追加
+- [groupingコマンド](./document/commands.md/#グルーピング--grouping)にメンバーを対象から外す`exlude`オプションを追加
 
 ### Changed
 
