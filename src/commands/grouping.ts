@@ -80,7 +80,6 @@ export class GroupingCommand extends Command {
         const exclude = interaction.options.getString("exclude-member") ?? "";
 
         const lastGroupingResults = container.lastGroupingResults;
-        console.log(lastGroupingResults);
 
         if (maxGroupSize < 2) {
             const embed = errorEmbed(
