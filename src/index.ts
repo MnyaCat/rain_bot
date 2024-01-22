@@ -11,7 +11,7 @@ envs.set("datasource", process.env.SPLATOON_DB_URL);
 envs.set("token", process.env.BOT_TOKEN);
 envs.forEach((value, key) => {
     if (!value) {
-        console.error(`必須の環境変数"${key}"が不足しています`);
+        container.logger.error(`必須の環境変数"${key}"が不足しています`);
         process.exit(1);
     }
 });
