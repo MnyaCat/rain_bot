@@ -7,19 +7,6 @@ import { getVoiceChannel, shuffleArray } from "../utils/utils";
 const commandId = process.env.GROUPING_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
 
-function grouping(members: string[], groupSize: number) {
-    const shuffledMembers = shuffleArray(members);
-
-    const groups: string[][] = [];
-    // iからi+groupSizeまで取り出し、i+groupSizeをiに代入
-    // groupSizeが3の場合は0,1を取り出す→2,3,4を取り出す→5,6,7を取り出す
-    for (let i = 0; i < shuffledMembers.length; i += groupSize) {
-        groups.push(shuffledMembers.slice(i, i + groupSize));
-    }
-
-    return groups;
-}
-
 @ApplyOptions<Command.Options>({
     name: "grouping",
     description:
@@ -154,6 +141,18 @@ export class GroupingCommand extends Command {
         container.lastGroupingResults = groups;
 
         return interaction.reply({ embeds: [embed] });
+    }
+
+    private grouping(memberIds: string[], groupSize: number) {
+        const shuffledMembers = shuffleArray(memberIds);
+        const groups: string[][] = [];
+
+        // iからi+groupSizeまで取り出し、i+groupSizeをiに代入
+        // groupSizeが3の場合は0,1を取り出す→2,3,4を取り出す→5,6,7を取り出す
+        for (let i = 0; i < shuffledMembers.length; i += groupSize) {
+            groups.push(shuffledMembers.slice(i, i + groupSize));
+        }
+        return groups;
     }
 
     private groupingResultEqual(result1: string[][], result2: string[][]) {
