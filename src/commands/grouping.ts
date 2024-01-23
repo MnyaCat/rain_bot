@@ -74,17 +74,19 @@ export class GroupingCommand extends Command {
         ].map((value) => value[1]);
 
         const voiceChannel = await getVoiceChannel(interaction);
-        const voiceChannnelMembers = voiceChannel.members
-            .map((member) => member.id)
-            .concat(additionalMemberIds);
-        const includeMemberMentions: string[] = [];
-        for (let i = 0; i < voiceChannnelMembers.length; i++) {
-            const memberId = voiceChannnelMembers[i];
-            if (!excludeMemberIds.includes(memberId)) {
-                includeMemberMentions.push(`<@${memberId}>`);
-            }
-        }
-        if (includeMemberMentions.length < 1) {
+        const voiceChannnelMemberIds = voiceChannel.members.map(
+            (member) => member.id
+        );
+        const targetMemberIds = voiceChannnelMemberIds
+            .concat(additionalMemberIds)
+            .filter(
+                (targetMemberId) =>
+                    !excludeMemberIds.some(
+                        (excludeMemberId) => excludeMemberId === targetMemberId
+                    )
+            );
+
+        if (targetMemberIds.length < 1) {
             const embed = errorEmbed(
                 "グループ分けの対象メンバーが1人未満です。`exclude`オプションを変更してください。"
             );
@@ -93,14 +95,14 @@ export class GroupingCommand extends Command {
 
         // メンバー数をできる限り均等にするために調整
         const groupSize =
-            includeMemberMentions.length /
-            Math.ceil(includeMemberMentions.length / maxGroupSize);
+            targetMemberIds.length /
+            Math.ceil(targetMemberIds.length / maxGroupSize);
 
         let loopLimitReached = false;
 
         const groups = (() => {
-            if (includeMemberMentions.length > groupSize) {
-                let groups = grouping(includeMemberMentions, groupSize);
+            if (targetMemberIds.length > groupSize) {
+                let groups = this.grouping(targetMemberIds, groupSize);
                 if (lastGroupingResults != undefined) {
                     const loopLimit = 10;
                     let count = 0;
@@ -108,7 +110,7 @@ export class GroupingCommand extends Command {
                         this.groupingResultEqual(lastGroupingResults, groups) &&
                         count < loopLimit
                     ) {
-                        groups = grouping(includeMemberMentions, groupSize);
+                        groups = this.grouping(targetMemberIds, groupSize);
                         count += 1;
                     }
 
@@ -118,7 +120,7 @@ export class GroupingCommand extends Command {
                 }
                 return groups;
             } else {
-                return [[...includeMemberMentions]];
+                return [[...targetMemberIds]];
             }
         })();
 
@@ -126,9 +128,12 @@ export class GroupingCommand extends Command {
             .setTitle("グループ分けの結果")
             .setFooter({ text: `groupsize: ${maxGroupSize}` });
         for (let i = 0; i < groups.length; i++) {
+            const memberMentions = groups[i].map(
+                (memberId) => `<@${memberId}>`
+            );
             embed.addFields({
                 name: `グループ${i + 1}`,
-                value: groups[i].join("\n"),
+                value: memberMentions.join("\n"),
             });
         }
 
