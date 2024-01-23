@@ -244,40 +244,53 @@ export class RandomCommand extends Command {
             single,
         };
 
-        // TODO: 各コマンドに必要なだけのオプションを渡す(=RandomCommandOptionsを使わない)
-        const replyOptions = await (() => {
-            switch (subCommand) {
-                case "weapon":
-                    return RandomCommand.buildRandomWeaponResult({
-                        interaction,
-                        options,
-                    });
-                case "subweapon":
-                    return RandomCommand.buildRandomSubWeaponResult({
-                        interaction,
-                        options,
-                    });
-                case "specialweapon":
-                    return RandomCommand.buildRandomSpecialWeaponResult({
-                        interaction,
-                        options,
-                    });
-                case "weapontype":
-                    return RandomCommand.buildRandomWeaponTypeResult({
-                        interaction,
-                        options,
-                    });
-                case "rule":
-                    return RandomCommand.buildRandomRuleResult({});
-                case "stage":
-                    return RandomCommand.buildRandomStageResult({
-                        options,
-                    });
-            }
-        })();
+        const replyOptions = await this.handleSubCommand({
+            subCommand,
+            interaction,
+            options,
+        });
 
         if (replyOptions != undefined) {
             return interaction.reply(replyOptions);
+        }
+    }
+
+    private async handleSubCommand({
+        subCommand,
+        interaction,
+        options,
+    }: {
+        subCommand: string;
+        interaction: Command.ChatInputCommandInteraction;
+        options: RandomCommandOptions;
+    }) {
+        switch (subCommand) {
+            case "weapon":
+                return RandomCommand.buildRandomWeaponResult({
+                    interaction,
+                    options,
+                });
+            case "subweapon":
+                return RandomCommand.buildRandomSubWeaponResult({
+                    interaction,
+                    options,
+                });
+            case "specialweapon":
+                return RandomCommand.buildRandomSpecialWeaponResult({
+                    interaction,
+                    options,
+                });
+            case "weapontype":
+                return RandomCommand.buildRandomWeaponTypeResult({
+                    interaction,
+                    options,
+                });
+            case "rule":
+                return RandomCommand.buildRandomRuleResult({});
+            case "stage":
+                return RandomCommand.buildRandomStageResult({
+                    options,
+                });
         }
     }
 
