@@ -57,7 +57,7 @@ export class GroupingCommand extends Command {
             interaction.options.getString("additional-member") ?? "";
         const exclude = interaction.options.getString("exclude-member") ?? "";
 
-        const lastGroupingResults = container.lastGroupingResults;
+        const lastGroupingResults = container.lastGroupingResult;
 
         if (maxGroupSize < 2) {
             const embed = errorEmbed(
@@ -138,7 +138,7 @@ export class GroupingCommand extends Command {
             );
         }
 
-        container.lastGroupingResults = groups;
+        container.lastGroupingResult = groups;
 
         return interaction.reply({ embeds: [embed] });
     }
