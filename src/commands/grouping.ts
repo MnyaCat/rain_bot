@@ -2,22 +2,13 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command, container } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder } from "discord.js";
-import { getVoiceChannel } from "../utils/utils";
+import { getVoiceChannel, shuffleArray } from "../utils/utils";
 
 const commandId = process.env.GROUPING_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
 
 function grouping(members: string[], groupSize: number) {
-    // membersに変更を加えないためにシャローコピー
-    const shuffledMembers = [...members];
-    // Fisher-Yatesアルゴリズムを使ったシャッフル
-    for (let i = shuffledMembers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledMembers[i], shuffledMembers[j]] = [
-            shuffledMembers[j],
-            shuffledMembers[i],
-        ];
-    }
+    const shuffledMembers = shuffleArray(members);
 
     const groups: string[][] = [];
     // iからi+groupSizeまで取り出し、i+groupSizeをiに代入
