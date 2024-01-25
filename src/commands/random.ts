@@ -13,7 +13,9 @@ import {
 import { getVoiceChannelMembers } from "../utils/utils";
 import { ItemNotFoundError } from "../errors";
 import {
+    Rule,
     SpecialWeapon,
+    Stage,
     SubWeapon,
     Weapon,
     WeaponType,
@@ -286,7 +288,7 @@ export class RandomCommand extends Command {
                     options,
                 });
             case "rule":
-                return RandomCommand.buildRandomRuleResult({});
+                return RandomCommand.buildRandomRuleResult({ options });
             case "stage":
                 return RandomCommand.buildRandomStageResult({
                     options,
@@ -320,21 +322,19 @@ export class RandomCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomElement(weapons);
-            embed = new EmbedBuilder()
-                .setTitle(`${randomCategory}の抽選結果です！`)
-                .setDescription(weapon.name)
-                .setFooter({ text: JSON.stringify(options) });
-            if (timestamp) {
-                embed.setTimestamp(new Date());
-            }
+            embed = this.buildSingleResultEmbed({
+                elements: weapons,
+                randomCategory: randomCategory,
+                commandOptions: options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers({ interaction });
-            embed = generateResultEmbed({
+            embed = this.buildResultEmbed({
                 members,
-                weapons,
+                elements: weapons,
                 randomCategory: randomCategory,
-                options,
+                commandOptions: options,
                 timestamp: timestamp,
             });
         }
@@ -368,21 +368,19 @@ export class RandomCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weapon = getRandomElement(subWeapons);
-            embed = new EmbedBuilder()
-                .setTitle(`${randomCategory}の抽選結果です！`)
-                .setDescription(weapon.name)
-                .setFooter({ text: JSON.stringify(options) });
-            if (timestamp) {
-                embed.setTimestamp(new Date());
-            }
+            embed = this.buildSingleResultEmbed({
+                elements: subWeapons,
+                randomCategory: randomCategory,
+                commandOptions: options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers({ interaction });
-            embed = generateResultEmbed({
+            embed = this.buildResultEmbed({
                 members,
-                weapons: subWeapons,
+                elements: subWeapons,
                 randomCategory: randomCategory,
-                options,
+                commandOptions: options,
                 timestamp: timestamp,
             });
         }
@@ -416,21 +414,19 @@ export class RandomCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const specialWeapon = getRandomElement(specialWeapons);
-            embed = new EmbedBuilder()
-                .setTitle(`${randomCategory}の抽選結果です！`)
-                .setDescription(specialWeapon.name)
-                .setFooter({ text: JSON.stringify(options) });
-            if (timestamp) {
-                embed.setTimestamp(new Date());
-            }
+            embed = this.buildSingleResultEmbed({
+                elements: specialWeapons,
+                randomCategory: randomCategory,
+                commandOptions: options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers({ interaction });
-            embed = generateResultEmbed({
+            embed = this.buildResultEmbed({
                 members,
-                weapons: specialWeapons,
+                elements: specialWeapons,
                 randomCategory: randomCategory,
-                options,
+                commandOptions: options,
                 timestamp: timestamp,
             });
         }
@@ -456,21 +452,19 @@ export class RandomCommand extends Command {
 
         let embed: EmbedBuilder;
         if (options.single) {
-            const weaponType = getRandomElement(weaponTypes);
-            embed = new EmbedBuilder()
-                .setTitle(`${randomCategory}の抽選結果です！`)
-                .setDescription(weaponType.name)
-                .setFooter({ text: JSON.stringify(options) });
-            if (timestamp) {
-                embed.setTimestamp(new Date());
-            }
+            embed = this.buildSingleResultEmbed({
+                elements: weaponTypes,
+                randomCategory: randomCategory,
+                commandOptions: options,
+                timestamp: timestamp,
+            });
         } else {
             const members = await getVoiceChannelMembers({ interaction });
-            embed = generateResultEmbed({
+            embed = this.buildResultEmbed({
                 members,
-                weapons: weaponTypes,
+                elements: weaponTypes,
                 randomCategory: randomCategory,
-                options,
+                commandOptions: options,
                 timestamp: timestamp,
             });
         }
@@ -482,21 +476,22 @@ export class RandomCommand extends Command {
     }
 
     public static async buildRandomRuleResult({
+        options,
         timestamp = false,
     }: {
+        options: RandomCommandOptions;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
         const rules = await prisma.rule.findMany();
         const randomCategory = randomCategoryName.rule;
 
-        const rule = getRandomElement(rules);
-        const embed = new EmbedBuilder()
-            .setTitle(`${randomCategory}の抽選結果です！`)
-            .setDescription(rule.name);
-        if (timestamp) {
-            embed.setTimestamp(new Date());
-        }
+        const embed = this.buildSingleResultEmbed({
+            elements: rules,
+            randomCategory: randomCategory,
+            commandOptions: options,
+            timestamp: timestamp,
+        });
         const row = buildRerollActionRow(rerollButtonIds.rule);
         return {
             embeds: [embed],
@@ -523,19 +518,81 @@ export class RandomCommand extends Command {
             throw new ItemNotFoundError();
         }
 
-        const stage = getRandomElement(stages);
-        const embed = new EmbedBuilder()
-            .setTitle(`${randomCategory}の抽選結果です！`)
-            .setDescription(stage.name)
-            .setFooter({ text: JSON.stringify(options) });
-        if (timestamp) {
-            embed.setTimestamp(new Date());
-        }
+        const embed = this.buildSingleResultEmbed({
+            elements: stages,
+            randomCategory: randomCategory,
+            commandOptions: options,
+            timestamp: timestamp,
+        });
         const row = buildRerollActionRow(rerollButtonIds.stage);
         return {
             embeds: [embed],
             components: [row],
         } as BaseMessageOptions;
+    }
+
+    private static buildResultEmbed<
+        T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+    >({
+        members,
+        elements,
+        randomCategory,
+        commandOptions,
+        timestamp = false,
+    }: {
+        members: GuildMember[];
+        elements: T[];
+        randomCategory: string;
+        commandOptions: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            // TODO: https://github.com/MnyaCat/rain_bot/issues/28
+            .setFooter({ text: JSON.stringify(commandOptions) });
+
+        const results = [];
+        for (let i = 0; i < members.length; i++) {
+            const member = members[i];
+            const weapon = getRandomElement(elements);
+            const mention = `<@${member.id}>`;
+            results.push(`- ${mention}: ${weapon.name}`);
+        }
+        embed.setDescription(results.join("\n"));
+
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+
+        return embed;
+    }
+
+    private static buildSingleResultEmbed<
+        T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+    >({
+        elements,
+        randomCategory,
+        commandOptions,
+        timestamp = false,
+    }: {
+        elements: T[];
+        randomCategory: string;
+        commandOptions: RandomCommandOptions;
+        timestamp?: boolean;
+    }) {
+        const embed = new EmbedBuilder()
+            .setTitle(`${randomCategory}の抽選結果です！`)
+            // TODO: https://github.com/MnyaCat/rain_bot/issues/28
+            .setFooter({ text: JSON.stringify(commandOptions) });
+
+        const randomElement = getRandomElement(elements);
+        embed.setDescription(randomElement.name);
+
+        if (timestamp) {
+            embed.setTimestamp(new Date());
+        }
+
+        return embed;
     }
 }
 
@@ -562,43 +619,10 @@ function generateChoices(
 }
 
 function getRandomElement<
-    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
 >(weapons: T[]): T {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
-}
-
-function generateResultEmbed<
-    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType
->({
-    members,
-    weapons,
-    randomCategory: random,
-    options,
-    timestamp = false,
-}: {
-    members: GuildMember[];
-    weapons: T[];
-    randomCategory: string;
-    options: RandomCommandOptions;
-    timestamp?: boolean;
-}) {
-    const results: string[] = [];
-    for (let i = 0; i < members.length; i++) {
-        const member = members[i];
-        const weapon = getRandomElement(weapons);
-        const mention = `<@${member.id}>`;
-        results.push(`- ${mention}: ${weapon.name}`);
-    }
-    const fotterText = JSON.stringify(options);
-    const embed = new EmbedBuilder()
-        .setTitle(`${random}の抽選結果です！`)
-        .setDescription(results.join("\n"))
-        .setFooter({ text: fotterText });
-    if (timestamp) {
-        embed.setTimestamp(new Date());
-    }
-    return embed;
 }
 
 function buildRerollActionRow(customId: string) {
