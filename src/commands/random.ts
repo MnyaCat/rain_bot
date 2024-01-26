@@ -299,9 +299,7 @@ export class RandomCommand extends Command {
             case "rule":
                 return RandomCommand.buildRandomRuleResult({});
             case "stage":
-                return RandomCommand.buildRandomStageResult({
-                    options,
-                });
+                return RandomCommand.buildRandomStageResult({ seasonId });
         }
     }
 
@@ -540,30 +538,30 @@ export class RandomCommand extends Command {
     }
 
     public static async buildRandomStageResult({
-        options,
+        seasonId,
         timestamp = false,
     }: {
-        options: RandomCommandOptions;
+        seasonId: number | undefined;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
         const stages = await prisma.stage.findMany({
             where: {
-                seasonId: options.seasonId,
+                seasonId: seasonId,
             },
         });
         const randomCategory = randomCategoryName.stage;
 
         if (stages.length < 1) {
             throw new RandomStageWeaponElementNotFoundError({
-                seasonId: options.seasonId,
+                seasonId: seasonId,
             });
         }
 
         const embed = this.buildSingleResultEmbed({
             elements: stages,
             randomCategory: randomCategory,
-            commandOptions: options,
+            commandOptions: { seasonId, single: false },
             timestamp: timestamp,
         });
         const row = buildRerollActionRow(rerollButtonIds.stage);
