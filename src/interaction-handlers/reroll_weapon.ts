@@ -21,8 +21,11 @@ export class ButtonHandler extends InteractionHandler {
         checkVoiceChannelJoining(member);
         const options = await getRandomCommandOptions(interaction);
         const replyOptions = await RandomCommand.buildRandomWeaponResult({
-            interaction,
-            options,
+            interaction: interaction,
+            subWeaponId: options.subWeaponId,
+            specialWeaponId: options.specialWeaponId,
+            seasonId: options.seasonId,
+            weaponTypeId: options.weaponTypeId,
             timestamp: true,
         });
         await interaction.update(replyOptions);

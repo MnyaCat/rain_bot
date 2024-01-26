@@ -273,7 +273,11 @@ export class RandomCommand extends Command {
             case "weapon":
                 return RandomCommand.buildRandomWeaponResult({
                     interaction,
-                    options,
+                    subWeaponId,
+                    specialWeaponId,
+                    seasonId,
+                    weaponTypeId,
+                    single,
                 });
             case "subweapon":
                 return RandomCommand.buildRandomSubWeaponResult({
@@ -301,20 +305,28 @@ export class RandomCommand extends Command {
 
     public static async buildRandomWeaponResult({
         interaction,
-        options,
+        subWeaponId,
+        specialWeaponId,
+        seasonId,
+        weaponTypeId,
+        single = false,
         timestamp = false,
     }: {
         interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
-        options: RandomCommandOptions;
+        subWeaponId: number | undefined;
+        specialWeaponId: number | undefined;
+        seasonId: number | undefined;
+        weaponTypeId: number | undefined;
+        single?: boolean;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
         const weapons = await prisma.weapon.findMany({
             where: {
-                subWeaponId: options.subWeaponId,
-                specialWeaponId: options.specialWeaponId,
-                seasonId: options.seasonId,
-                weaponTypeId: options.weaponTypeId,
+                subWeaponId: subWeaponId,
+                specialWeaponId: specialWeaponId,
+                seasonId: seasonId,
+                weaponTypeId: weaponTypeId,
             },
         });
         const randomCategory = randomCategoryName.weapon;
@@ -329,11 +341,17 @@ export class RandomCommand extends Command {
         }
 
         let embed: EmbedBuilder;
-        if (options.single) {
+        if (single) {
             embed = this.buildSingleResultEmbed({
                 elements: weapons,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: {
+                    subWeaponId,
+                    specialWeaponId,
+                    seasonId,
+                    weaponTypeId,
+                    single,
+                },
                 timestamp: timestamp,
             });
         } else {
@@ -342,7 +360,13 @@ export class RandomCommand extends Command {
                 members,
                 elements: weapons,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: {
+                    subWeaponId,
+                    specialWeaponId,
+                    seasonId,
+                    weaponTypeId,
+                    single,
+                },
                 timestamp: timestamp,
             });
         }
