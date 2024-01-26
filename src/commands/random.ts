@@ -12,7 +12,6 @@ import {
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
 import {
-    ElementNotFoundError,
     RandomSpecialWeaponElementNotFoundError,
     RandomStageWeaponElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
