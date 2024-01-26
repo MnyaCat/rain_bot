@@ -11,7 +11,13 @@ import {
     GuildMember,
 } from "discord.js";
 import { getVoiceChannelMembers } from "../utils/utils";
-import { ItemNotFoundError } from "../errors";
+import {
+    ElementNotFoundError,
+    RandomSpecialWeaponElementNotFoundError,
+    RandomStageWeaponElementNotFoundError,
+    RandomSubWeaponElementNotFoundError,
+    RandomWeaponElementNotFoundError,
+} from "../errors";
 import {
     Rule,
     SpecialWeapon,
@@ -317,7 +323,12 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.weapon;
 
         if (weapons.length < 1) {
-            throw new ItemNotFoundError();
+            throw new RandomWeaponElementNotFoundError({
+                subWeaponId,
+                specialWeaponId,
+                seasonId,
+                weaponTypeId,
+            });
         }
 
         let embed: EmbedBuilder;
@@ -363,7 +374,9 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.subWeapon;
 
         if (subWeapons.length < 1) {
-            throw new ItemNotFoundError();
+            throw new RandomSubWeaponElementNotFoundError({
+                seasonId: options.seasonId,
+            });
         }
 
         let embed: EmbedBuilder;
@@ -409,7 +422,9 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.specialWeapon;
 
         if (specialWeapons.length < 1) {
-            throw new ItemNotFoundError();
+            throw new RandomSpecialWeaponElementNotFoundError({
+                seasonId: options.seasonId,
+            });
         }
 
         let embed: EmbedBuilder;
@@ -515,7 +530,9 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.stage;
 
         if (stages.length < 1) {
-            throw new ItemNotFoundError();
+            throw new RandomStageWeaponElementNotFoundError({
+                seasonId: options.seasonId,
+            });
         }
 
         const embed = this.buildSingleResultEmbed({
