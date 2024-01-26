@@ -22,8 +22,9 @@ export class ButtonHandler extends InteractionHandler {
         const options = await getRandomCommandOptions(interaction);
         const replyOptions = await RandomCommand.buildRandomSpecialWeaponResult(
             {
-                interaction,
-                options,
+                interaction: interaction,
+                seasonId: options.seasonId,
+                single: options.single,
                 timestamp: true,
             }
         );

@@ -288,7 +288,8 @@ export class RandomCommand extends Command {
             case "specialweapon":
                 return RandomCommand.buildRandomSpecialWeaponResult({
                     interaction,
-                    options,
+                    seasonId,
+                    single,
                 });
             case "weapontype":
                 return RandomCommand.buildRandomWeaponTypeResult({
@@ -430,33 +431,35 @@ export class RandomCommand extends Command {
 
     public static async buildRandomSpecialWeaponResult({
         interaction,
-        options,
+        seasonId,
+        single = false,
         timestamp = false,
     }: {
         interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
-        options: RandomCommandOptions;
+        seasonId: number | undefined;
+        single?: boolean;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
         const specialWeapons = await prisma.specialWeapon.findMany({
             where: {
-                seasonId: options.seasonId,
+                seasonId: seasonId,
             },
         });
         const randomCategory = randomCategoryName.specialWeapon;
 
         if (specialWeapons.length < 1) {
             throw new RandomSpecialWeaponElementNotFoundError({
-                seasonId: options.seasonId,
+                seasonId: seasonId,
             });
         }
 
         let embed: EmbedBuilder;
-        if (options.single) {
+        if (single) {
             embed = this.buildSingleResultEmbed({
                 elements: specialWeapons,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         } else {
@@ -465,7 +468,7 @@ export class RandomCommand extends Command {
                 members,
                 elements: specialWeapons,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         }
