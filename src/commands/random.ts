@@ -235,6 +235,24 @@ export class RandomCommand extends Command {
             | "weapontype"
             | "rule"
             | "stage";
+
+        const replyOptions = await this.handleSubCommand({
+            subCommand,
+            interaction,
+        });
+
+        if (replyOptions != undefined) {
+            return interaction.reply(replyOptions);
+        }
+    }
+
+    private async handleSubCommand({
+        subCommand,
+        interaction,
+    }: {
+        subCommand: string;
+        interaction: Command.ChatInputCommandInteraction;
+    }) {
         const single = interaction.options.getBoolean("single") ?? false;
         const subWeaponId = interaction.options.getNumber("sub") ?? undefined;
         const specialWeaponId =
@@ -251,26 +269,6 @@ export class RandomCommand extends Command {
             single,
         };
 
-        const replyOptions = await this.handleSubCommand({
-            subCommand,
-            interaction,
-            options,
-        });
-
-        if (replyOptions != undefined) {
-            return interaction.reply(replyOptions);
-        }
-    }
-
-    private async handleSubCommand({
-        subCommand,
-        interaction,
-        options,
-    }: {
-        subCommand: string;
-        interaction: Command.ChatInputCommandInteraction;
-        options: RandomCommandOptions;
-    }) {
         switch (subCommand) {
             case "weapon":
                 return RandomCommand.buildRandomWeaponResult({
