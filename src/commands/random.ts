@@ -261,14 +261,6 @@ export class RandomCommand extends Command {
         const weaponTypeId =
             interaction.options.getNumber("weapontype") ?? undefined;
 
-        const options = {
-            subWeaponId,
-            specialWeaponId,
-            seasonId,
-            weaponTypeId,
-            single,
-        };
-
         switch (subCommand) {
             case "weapon":
                 return RandomCommand.buildRandomWeaponResult({
