@@ -297,7 +297,7 @@ export class RandomCommand extends Command {
                     single,
                 });
             case "rule":
-                return RandomCommand.buildRandomRuleResult({ options });
+                return RandomCommand.buildRandomRuleResult({});
             case "stage":
                 return RandomCommand.buildRandomStageResult({
                     options,
@@ -518,10 +518,8 @@ export class RandomCommand extends Command {
     }
 
     public static async buildRandomRuleResult({
-        options,
         timestamp = false,
     }: {
-        options: RandomCommandOptions;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
@@ -531,7 +529,7 @@ export class RandomCommand extends Command {
         const embed = this.buildSingleResultEmbed({
             elements: rules,
             randomCategory: randomCategory,
-            commandOptions: options,
+            commandOptions: { single: false },
             timestamp: timestamp,
         });
         const row = buildRerollActionRow(rerollButtonIds.rule);
