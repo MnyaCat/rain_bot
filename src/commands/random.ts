@@ -294,7 +294,7 @@ export class RandomCommand extends Command {
             case "weapontype":
                 return RandomCommand.buildRandomWeaponTypeResult({
                     interaction,
-                    options,
+                    single,
                 });
             case "rule":
                 return RandomCommand.buildRandomRuleResult({ options });
@@ -481,11 +481,11 @@ export class RandomCommand extends Command {
 
     public static async buildRandomWeaponTypeResult({
         interaction,
-        options,
+        single = false,
         timestamp = false,
     }: {
         interaction: Command.ChatInputCommandInteraction | ButtonInteraction;
-        options: RandomCommandOptions;
+        single?: boolean;
         timestamp?: boolean;
     }) {
         const prisma = container.database;
@@ -493,11 +493,11 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.weaponType;
 
         let embed: EmbedBuilder;
-        if (options.single) {
+        if (single) {
             embed = this.buildSingleResultEmbed({
                 elements: weaponTypes,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: { single },
                 timestamp: timestamp,
             });
         } else {
@@ -506,7 +506,7 @@ export class RandomCommand extends Command {
                 members,
                 elements: weaponTypes,
                 randomCategory: randomCategory,
-                commandOptions: options,
+                commandOptions: { single },
                 timestamp: timestamp,
             });
         }
