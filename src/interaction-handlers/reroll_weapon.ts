@@ -25,6 +25,7 @@ export class ButtonHandler extends InteractionHandler {
             specialWeaponId: options.specialWeaponId,
             seasonId: options.seasonId,
             weaponTypeId: options.weaponTypeId,
+            single: options.single,
             timestamp: true,
         });
         await interaction.update(replyOptions);
