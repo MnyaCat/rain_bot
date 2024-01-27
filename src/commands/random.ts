@@ -362,7 +362,17 @@ export class RandomCommand extends Command {
                 timestamp: timestamp,
             });
         }
-        const row = buildRerollActionRow(rerollButtonIds.weapon);
+        const row = buildRerollActionRow(
+            rerollButtonIds.weapon +
+                ";" +
+                JSON.stringify({
+                    subWeaponId,
+                    specialWeaponId,
+                    seasonId,
+                    weaponTypeId,
+                    single,
+                } as RandomWeaponOptions)
+        );
         return {
             embeds: [embed],
             components: [row],
@@ -629,6 +639,14 @@ export class RandomCommand extends Command {
 }
 
 export interface RandomCommandOptions {
+    subWeaponId?: number;
+    specialWeaponId?: number;
+    seasonId?: number;
+    weaponTypeId?: number;
+    single: boolean;
+}
+
+export interface RandomWeaponOptions {
     subWeaponId?: number;
     specialWeaponId?: number;
     seasonId?: number;
