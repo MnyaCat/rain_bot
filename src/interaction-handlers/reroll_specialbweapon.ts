@@ -5,21 +5,20 @@ import {
 } from "@sapphire/framework";
 import { type ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommand } from "../commands/random";
-import {
-    checkVoiceChannelJoining,
-    getExecutedMember,
-    getRandomCommandOptions,
-} from "../utils/utils";
+import { RandomCommand, RandomSpecialWeaponOptions } from "../commands/random";
+import { checkVoiceChannelJoining, getExecutedMember } from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
 })
 export class ButtonHandler extends InteractionHandler {
-    public async run(interaction: ButtonInteraction) {
+    public async run(
+        interaction: ButtonInteraction,
+        parsedData: InteractionHandler.ParseResult<this>
+    ) {
         const member = await getExecutedMember(interaction);
         checkVoiceChannelJoining(member);
-        const options = await getRandomCommandOptions(interaction);
+        const options = parsedData.options;
         const replyOptions = await RandomCommand.buildRandomSpecialWeaponResult(
             {
                 interaction: interaction,
@@ -32,8 +31,11 @@ export class ButtonHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ButtonInteraction) {
-        if (interaction.customId !== rerollButtonIds.specialWeapon)
+        const customId = interaction.customId;
+        if (!customId.startsWith(rerollButtonIds.specialWeapon))
             return this.none();
-        return this.some();
+        const json = customId.substring(customId.indexOf(";") + 1);
+        const options = JSON.parse(json) as RandomSpecialWeaponOptions;
+        return this.some({ options: options });
     }
 }
