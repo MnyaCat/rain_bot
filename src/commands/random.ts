@@ -600,19 +600,16 @@ export class RandomCommand extends Command {
         members,
         elements,
         randomCategory,
-        commandOptions,
         timestamp = false,
     }: {
         members: GuildMember[];
         elements: T[];
         randomCategory: string;
-        commandOptions: RandomCommandOptions;
         timestamp?: boolean;
     }) {
-        const embed = new EmbedBuilder()
-            .setTitle(`${randomCategory}の抽選結果です！`)
-            // TODO: https://github.com/MnyaCat/rain_bot/issues/28
-            .setFooter({ text: JSON.stringify(commandOptions) });
+        const embed = new EmbedBuilder().setTitle(
+            `${randomCategory}の抽選結果です！`
+        );
 
         const results = [];
         for (let i = 0; i < members.length; i++) {
