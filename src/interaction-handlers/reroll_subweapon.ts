@@ -6,7 +6,11 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { RandomCommand, RandomSubWeaponOptions } from "../commands/random";
-import { checkVoiceChannelJoining, getExecutedMember } from "../utils/utils";
+import {
+    checkCustomId,
+    checkVoiceChannelJoining,
+    getExecutedMember,
+} from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -30,7 +34,8 @@ export class ButtonHandler extends InteractionHandler {
 
     public override parse(interaction: ButtonInteraction) {
         const customId = interaction.customId;
-        if (!customId.startsWith(rerollButtonIds.subWeapon)) return this.none();
+        if (!checkCustomId(customId, rerollButtonIds.subWeapon))
+            return this.none();
         const json = customId.substring(customId.indexOf(";") + 1);
         const options = JSON.parse(json) as RandomSubWeaponOptions;
         return this.some({ options: options });

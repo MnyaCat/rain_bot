@@ -6,7 +6,11 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { RandomCommand, RandomStageOptions } from "../commands/random";
-import { checkVoiceChannelJoining, getExecutedMember } from "../utils/utils";
+import {
+    checkCustomId,
+    checkVoiceChannelJoining,
+    getExecutedMember,
+} from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -28,7 +32,7 @@ export class ButtonHandler extends InteractionHandler {
 
     public override parse(interaction: ButtonInteraction) {
         const customId = interaction.customId;
-        if (!customId.startsWith(rerollButtonIds.stage)) return this.none();
+        if (!checkCustomId(customId, rerollButtonIds.stage)) return this.none();
         const json = customId.substring(customId.indexOf(";") + 1);
         const options = JSON.parse(json) as RandomStageOptions;
         return this.some({ options: options });

@@ -33,7 +33,11 @@ export class ButtonHandler extends InteractionHandler {
 
     public override parse(interaction: ButtonInteraction) {
         const customId = interaction.customId;
-        if (!customId.startsWith(rerollButtonIds.weapon)) return this.none();
+        if (
+            customId.substring(0, customId.indexOf(";")) !==
+            rerollButtonIds.weapon
+        )
+            return this.none();
         const json = customId.substring(customId.indexOf(";") + 1);
         const options = JSON.parse(json) as RandomWeaponOptions;
         return this.some({ options: options });
