@@ -11,6 +11,7 @@ import {
     MemberVoiceChannelNotJoining,
 } from "../errors";
 import { RandomCommandOptions } from "../commands/random";
+import { ButtonIdDelimiter } from "../constants";
 
 export async function getExecutedMember(
     interaction: ChatInputCommandInteraction | ButtonInteraction
@@ -83,4 +84,16 @@ export function shuffleArray<T>(array: T[]): T[] {
     }
 
     return shuffledArray;
+}
+
+// ボタンのcustomIdは`buttonId;options`の構造になっている
+// その内、buttonIdが一致しているかを調べる
+export function checkCustomId(customId: string, targetId: string) {
+    let buttonId: string;
+    if (customId.includes(ButtonIdDelimiter)) {
+        buttonId = customId.substring(0, customId.indexOf(ButtonIdDelimiter));
+    } else {
+        buttonId = customId;
+    }
+    return buttonId === targetId;
 }
