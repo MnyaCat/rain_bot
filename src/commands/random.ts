@@ -632,18 +632,15 @@ export class RandomCommand extends Command {
     >({
         elements,
         randomCategory,
-        commandOptions,
         timestamp = false,
     }: {
         elements: T[];
         randomCategory: string;
-        commandOptions: RandomCommandOptions;
         timestamp?: boolean;
     }) {
-        const embed = new EmbedBuilder()
-            .setTitle(`${randomCategory}の抽選結果です！`)
-            // TODO: https://github.com/MnyaCat/rain_bot/issues/28
-            .setFooter({ text: JSON.stringify(commandOptions) });
+        const embed = new EmbedBuilder().setTitle(
+            `${randomCategory}の抽選結果です！`
+        );
 
         const randomElement = getRandomElement(elements);
         embed.setDescription(randomElement.name);
