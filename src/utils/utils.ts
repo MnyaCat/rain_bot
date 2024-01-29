@@ -97,3 +97,7 @@ export function checkCustomId(customId: string, targetId: string) {
     }
     return buttonId === targetId;
 }
+
+export function buildCustomId(id: string, options?: string) {
+    return id + ButtonIdDelimiter + options ?? "";
+}
