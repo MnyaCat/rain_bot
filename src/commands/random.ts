@@ -363,8 +363,8 @@ export class RandomCommand extends Command {
             });
         }
         const row = buildRerollActionRow(
-            rerollButtonIds.weapon +
-                ";" +
+            buildCustomId(
+                rerollButtonIds.weapon,
                 JSON.stringify({
                     subWeaponId,
                     specialWeaponId,
@@ -372,6 +372,7 @@ export class RandomCommand extends Command {
                     weaponTypeId,
                     single,
                 } as RandomWeaponOptions)
+            )
         );
         return {
             embeds: [embed],
@@ -423,9 +424,10 @@ export class RandomCommand extends Command {
             });
         }
         const row = buildRerollActionRow(
-            rerollButtonIds.subWeapon +
-                ";" +
+            buildCustomId(
+                rerollButtonIds.subWeapon,
                 JSON.stringify({ seasonId, single } as RandomSubWeaponOptions)
+            )
         );
         return {
             embeds: [embed],
@@ -477,12 +479,13 @@ export class RandomCommand extends Command {
             });
         }
         const row = buildRerollActionRow(
-            rerollButtonIds.specialWeapon +
-                ";" +
+            buildCustomId(
+                rerollButtonIds.specialWeapon,
                 JSON.stringify({
                     seasonId,
                     single,
                 } as RandomSpecialWeaponOptions)
+            )
         );
         return {
             embeds: [embed],
@@ -548,7 +551,7 @@ export class RandomCommand extends Command {
             commandOptions: { single: false },
             timestamp: timestamp,
         });
-        const row = buildRerollActionRow(rerollButtonIds.rule);
+        const row = buildRerollActionRow(buildCustomId(rerollButtonIds.rule));
         return {
             embeds: [embed],
             components: [row],
@@ -583,7 +586,7 @@ export class RandomCommand extends Command {
             timestamp: timestamp,
         });
         const row = buildRerollActionRow(
-            rerollButtonIds.stage + ";" + JSON.stringify({ seasonId })
+            buildCustomId(rerollButtonIds.stage, JSON.stringify({ seasonId }))
         );
         return {
             embeds: [embed],
