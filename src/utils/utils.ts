@@ -88,6 +88,7 @@ export function shuffleArray<T>(array: T[]): T[] {
 
 // ボタンのcustomIdは`buttonId;options`の構造になっている
 // その内、buttonIdが一致しているかを調べる
+// startWithで比較すると、reroll-weapontypeを押すとreroll-weaponも反応してしまうため
 export function checkCustomId(customId: string, targetId: string) {
     let buttonId: string;
     if (customId.includes(ButtonIdDelimiter)) {
