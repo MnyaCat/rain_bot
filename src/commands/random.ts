@@ -352,13 +352,6 @@ export class RandomCommand extends Command {
                 members,
                 elements: weapons,
                 randomCategory: randomCategory,
-                commandOptions: {
-                    subWeaponId,
-                    specialWeaponId,
-                    seasonId,
-                    weaponTypeId,
-                    single,
-                },
                 timestamp: timestamp,
             });
         }
@@ -419,7 +412,6 @@ export class RandomCommand extends Command {
                 members,
                 elements: subWeapons,
                 randomCategory: randomCategory,
-                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         }
@@ -474,7 +466,6 @@ export class RandomCommand extends Command {
                 members,
                 elements: specialWeapons,
                 randomCategory: randomCategory,
-                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         }
@@ -520,7 +511,6 @@ export class RandomCommand extends Command {
                 members,
                 elements: weaponTypes,
                 randomCategory: randomCategory,
-                commandOptions: { single },
                 timestamp: timestamp,
             });
         }
