@@ -337,13 +337,6 @@ export class RandomCommand extends Command {
             embed = this.buildSingleResultEmbed({
                 elements: weapons,
                 randomCategory: randomCategory,
-                commandOptions: {
-                    subWeaponId,
-                    specialWeaponId,
-                    seasonId,
-                    weaponTypeId,
-                    single,
-                },
                 timestamp: timestamp,
             });
         } else {
@@ -403,7 +396,6 @@ export class RandomCommand extends Command {
             embed = this.buildSingleResultEmbed({
                 elements: subWeapons,
                 randomCategory: randomCategory,
-                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         } else {
@@ -457,7 +449,6 @@ export class RandomCommand extends Command {
             embed = this.buildSingleResultEmbed({
                 elements: specialWeapons,
                 randomCategory: randomCategory,
-                commandOptions: { seasonId, single },
                 timestamp: timestamp,
             });
         } else {
@@ -502,7 +493,6 @@ export class RandomCommand extends Command {
             embed = this.buildSingleResultEmbed({
                 elements: weaponTypes,
                 randomCategory: randomCategory,
-                commandOptions: { single },
                 timestamp: timestamp,
             });
         } else {
@@ -538,7 +528,6 @@ export class RandomCommand extends Command {
         const embed = this.buildSingleResultEmbed({
             elements: rules,
             randomCategory: randomCategory,
-            commandOptions: { single: false },
             timestamp: timestamp,
         });
         const row = buildRerollActionRow(buildCustomId(rerollButtonIds.rule));
@@ -572,7 +561,6 @@ export class RandomCommand extends Command {
         const embed = this.buildSingleResultEmbed({
             elements: stages,
             randomCategory: randomCategory,
-            commandOptions: { seasonId, single: false },
             timestamp: timestamp,
         });
         const row = buildRerollActionRow(
