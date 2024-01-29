@@ -10,7 +10,7 @@ import {
     EmbedBuilder,
     GuildMember,
 } from "discord.js";
-import { getVoiceChannelMembers } from "../utils/utils";
+import { buildCustomId, getVoiceChannelMembers } from "../utils/utils";
 import {
     RandomSpecialWeaponElementNotFoundError,
     RandomStageWeaponElementNotFoundError,
@@ -521,7 +521,12 @@ export class RandomCommand extends Command {
                 timestamp: timestamp,
             });
         }
-        const row = buildRerollActionRow(rerollButtonIds.weaponType);
+        const row = buildRerollActionRow(
+            buildCustomId(
+                rerollButtonIds.weaponType,
+                JSON.stringify({ single } as RandomWeaponTypeOptions)
+            )
+        );
         return {
             embeds: [embed],
             components: [row],
@@ -674,6 +679,10 @@ export interface RandomSubWeaponOptions {
 
 export interface RandomSpecialWeaponOptions {
     seasonId?: number;
+    single: boolean;
+}
+
+export interface RandomWeaponTypeOptions {
     single: boolean;
 }
 
