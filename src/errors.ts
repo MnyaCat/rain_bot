@@ -1,12 +1,10 @@
 export class RainBotBaseError extends Error {}
 
-// TODO: これを継承したExecutedMemberNotFoundを作る
-// 実際には実行したユーザーが取得できなかった時に投げられているので
-export class GuildMemberNotFoundError extends RainBotBaseError {
+export class ExecutedMemberNotFound extends RainBotBaseError {
     constructor(message?: string) {
-        super(message ?? "Failed to retrieve GuildMember");
-        this.name = "GuildMemberNotFoundError";
-        Object.setPrototypeOf(this, GuildMemberNotFoundError.prototype);
+        super(message ?? "Failed to retrieve executed member");
+        this.name = "ExecutedMemberNotFound";
+        Object.setPrototypeOf(this, ExecutedMemberNotFound.prototype);
     }
 }
 

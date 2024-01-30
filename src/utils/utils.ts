@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import {
     CommandOptionFetchFailedError,
-    GuildMemberNotFoundError,
+    ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     MemberVoiceChannelNotJoining,
 } from "../errors";
@@ -21,7 +21,7 @@ export async function getExecutedMember(
             ? interaction.member
             : interaction.guild?.members.cache.get(interaction.user.id);
     if (!member) {
-        throw new GuildMemberNotFoundError();
+        throw new ExecutedMemberNotFound();
     } else {
         return member;
     }

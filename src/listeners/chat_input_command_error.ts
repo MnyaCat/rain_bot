@@ -8,7 +8,7 @@ import {
     generateItemNotFoundErrorEmbed,
 } from "../utils/embed_builder";
 import {
-    GuildMemberNotFoundError,
+    ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     ElementNotFoundError,
 } from "../errors";
@@ -44,7 +44,7 @@ export class ChatInputCommandErrorListener extends Listener {
                 single,
             };
 
-            if (error instanceof GuildMemberNotFoundError) {
+            if (error instanceof ExecutedMemberNotFound) {
                 return errorEmbed(
                     "実行したユーザーの情報が取得できませんでした。"
                 );

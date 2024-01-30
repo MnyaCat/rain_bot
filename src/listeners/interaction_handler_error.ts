@@ -2,7 +2,7 @@ import { Events, Listener, InteractionHandlerError } from "@sapphire/framework";
 import { errorEmbed } from "../utils/embed_builder";
 import {
     CommandOptionFetchFailedError,
-    GuildMemberNotFoundError,
+    ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     MemberVoiceChannelNotJoining,
 } from "../errors";
@@ -19,7 +19,7 @@ export class InteractionHandlerErrorListener extends Listener {
     public async run(error: unknown, { interaction }: InteractionHandlerError) {
         if (interaction instanceof ButtonInteraction) {
             const embed = (() => {
-                if (error instanceof GuildMemberNotFoundError) {
+                if (error instanceof ExecutedMemberNotFound) {
                     return errorEmbed(
                         "実行したユーザーの情報が取得できませんでした。"
                     );
