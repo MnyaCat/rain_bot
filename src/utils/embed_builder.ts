@@ -2,6 +2,7 @@ import { EmbedBuilder } from "discord.js";
 import { errorColor } from "../constants";
 import { container } from "@sapphire/framework";
 import { RandomCommandOptions } from "../commands/random";
+import { RandomWeaponElementNotFoundError } from "../errors";
 
 export function buildErrorEmbed(description?: string) {
     const embed = new EmbedBuilder()
@@ -67,5 +68,49 @@ export async function generateItemNotFoundErrorEmbed(
 
     return buildErrorEmbed(
         "以下の条件に合うアイテムがありません。\n\n" + filtersTexts.join("\n")
+    );
+}
+
+export async function buildRandomWeaponElementNotFoundEmbed(
+    error: RandomWeaponElementNotFoundError
+) {
+    const prisma = container.database;
+    const subWeaponFilter =
+        error.subWeaponId != null
+            ? await prisma.subWeapon.findFirst({
+                  where: { id: error.subWeaponId },
+              })
+            : null;
+    const specialWeaponFilter =
+        error.specialWeaponId != null
+            ? await prisma.specialWeapon.findFirst({
+                  where: { id: error.specialWeaponId },
+              })
+            : null;
+    const seasonFilter =
+        error.seasonId != null
+            ? await prisma.season.findFirst({ where: { id: error.seasonId } })
+            : null;
+    const weaponTypeFilter =
+        error.weaponTypeId != null
+            ? await prisma.weaponType.findFirst({
+                  where: { id: error.weaponTypeId },
+              })
+            : null;
+    const options = new Map([
+        ["サブウェポン", subWeaponFilter],
+        ["スペシャルウェポン", specialWeaponFilter],
+        ["シーズン", seasonFilter],
+        ["ブキタイプ", weaponTypeFilter],
+    ]);
+    let errorMessage = "";
+    for (const [key, value] of options) {
+        if (value != undefined) {
+            errorMessage += `- ${key}: **${value.name}**\n`;
+        }
+    }
+
+    return buildErrorEmbed(
+        "以下の条件に合うブキがありません。\n\n" + errorMessage
     );
 }
