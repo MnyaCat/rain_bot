@@ -3,7 +3,7 @@ import { errorColor } from "../constants";
 import { container } from "@sapphire/framework";
 import { RandomCommandOptions } from "../commands/random";
 
-export function errorEmbed(description?: string) {
+export function buildErrorEmbed(description?: string) {
     const embed = new EmbedBuilder()
         .setColor(errorColor)
         .setTitle("エラーが発生しました");
@@ -65,7 +65,7 @@ export async function generateItemNotFoundErrorEmbed(
         }
     }
 
-    return errorEmbed(
+    return buildErrorEmbed(
         "以下の条件に合うアイテムがありません。\n\n" + filtersTexts.join("\n")
     );
 }

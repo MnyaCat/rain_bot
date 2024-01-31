@@ -4,7 +4,7 @@ import {
     type ChatInputCommandDeniedPayload,
     type UserError,
 } from "@sapphire/framework";
-import { errorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embed_builder";
 
 export class ChatInputCommandDeniedListener extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {
@@ -18,7 +18,7 @@ export class ChatInputCommandDeniedListener extends Listener {
         error: UserError,
         { interaction }: ChatInputCommandDeniedPayload
     ) {
-        const embed = errorEmbed(error.message);
+        const embed = buildErrorEmbed(error.message);
         if (interaction.deferred || interaction.replied) {
             return interaction.editReply({
                 content: null,

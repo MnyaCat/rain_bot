@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command, container } from "@sapphire/framework";
-import { errorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder } from "discord.js";
 import { getVoiceChannel, shuffleArray } from "../utils/utils";
 
@@ -60,7 +60,7 @@ export class GroupingCommand extends Command {
         const lastGroupingResults = container.lastGroupingResult;
 
         if (maxGroupSize < 2) {
-            const embed = errorEmbed(
+            const embed = buildErrorEmbed(
                 "`groupsize`に入力された数値が範囲外です。2以上の値を入力してください。"
             );
             return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -87,7 +87,7 @@ export class GroupingCommand extends Command {
             );
 
         if (targetMemberIds.length < 1) {
-            const embed = errorEmbed(
+            const embed = buildErrorEmbed(
                 "グループ分けの対象メンバーが1人未満です。`exclude`オプションを変更してください。"
             );
             return interaction.reply({ embeds: [embed], ephemeral: true });

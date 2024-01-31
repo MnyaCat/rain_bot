@@ -1,5 +1,5 @@
 import { Events, Listener, InteractionHandlerError } from "@sapphire/framework";
-import { errorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embed_builder";
 import {
     CommandOptionFetchFailedError,
     ExecutedMemberNotFound,
@@ -20,23 +20,23 @@ export class InteractionHandlerErrorListener extends Listener {
         if (interaction instanceof ButtonInteraction) {
             const embed = (() => {
                 if (error instanceof ExecutedMemberNotFound) {
-                    return errorEmbed(
+                    return buildErrorEmbed(
                         "実行したユーザーの情報が取得できませんでした。"
                     );
                 } else if (error instanceof MemberVoiceChannelNotJoining) {
-                    return errorEmbed(
+                    return buildErrorEmbed(
                         "実行したサーバーでボイスチャンネルに参加している状態で実行してください。"
                     );
                 } else if (error instanceof MemberVoiceChannelNotFoundError) {
-                    return errorEmbed(
+                    return buildErrorEmbed(
                         "ボイスチャンネルの情報が取得できませんでした。実行したサーバーでボイスチャンネルに参加しているか確かめてください。"
                     );
                 } else if (error instanceof CommandOptionFetchFailedError) {
-                    return errorEmbed("オプションの取得に失敗しました。");
+                    return buildErrorEmbed("オプションの取得に失敗しました。");
                 } else if (error instanceof Error) {
-                    return errorEmbed(`throw: ${error.message}`);
+                    return buildErrorEmbed(`throw: ${error.message}`);
                 } else {
-                    return errorEmbed(`throw: ${error}`);
+                    return buildErrorEmbed(`throw: ${error}`);
                 }
             })();
 

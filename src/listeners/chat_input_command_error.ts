@@ -4,7 +4,7 @@ import {
     ChatInputCommandErrorPayload,
 } from "@sapphire/framework";
 import {
-    errorEmbed,
+    buildErrorEmbed,
     generateItemNotFoundErrorEmbed,
 } from "../utils/embed_builder";
 import {
@@ -45,19 +45,19 @@ export class ChatInputCommandErrorListener extends Listener {
             };
 
             if (error instanceof ExecutedMemberNotFound) {
-                return errorEmbed(
+                return buildErrorEmbed(
                     "実行したユーザーの情報が取得できませんでした。"
                 );
             } else if (error instanceof MemberVoiceChannelNotFoundError) {
-                return errorEmbed(
+                return buildErrorEmbed(
                     "ボイスチャンネルの情報が取得できませんでした。実行したサーバーでボイスチャンネルに参加しているか確かめてください。"
                 );
             } else if (error instanceof ElementNotFoundError) {
                 return generateItemNotFoundErrorEmbed(randomCommandOptions);
             } else if (error instanceof Error) {
-                return errorEmbed(`throw: ${error.message}`);
+                return buildErrorEmbed(`throw: ${error.message}`);
             } else {
-                return errorEmbed(`throw: ${error}`);
+                return buildErrorEmbed(`throw: ${error}`);
             }
         })();
 
