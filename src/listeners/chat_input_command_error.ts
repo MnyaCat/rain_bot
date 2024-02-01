@@ -5,6 +5,7 @@ import {
 } from "@sapphire/framework";
 import {
     buildErrorEmbed,
+    buildRandomSpecialWeaponElementNotFoundEmbed,
     buildRandomSubWeaponElementNotFoundEmbed,
     buildRandomWeaponElementNotFoundEmbed,
     generateItemNotFoundErrorEmbed,
@@ -15,6 +16,7 @@ import {
     ElementNotFoundError,
     RandomWeaponElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
+    RandomSpecialWeaponElementNotFoundError,
 } from "../errors";
 
 export class ChatInputCommandErrorListener extends Listener {
@@ -62,6 +64,10 @@ export class ChatInputCommandErrorListener extends Listener {
                 return buildRandomWeaponElementNotFoundEmbed(error);
             } else if (error instanceof RandomSubWeaponElementNotFoundError) {
                 return buildRandomSubWeaponElementNotFoundEmbed(error);
+            } else if (
+                error instanceof RandomSpecialWeaponElementNotFoundError
+            ) {
+                return buildRandomSpecialWeaponElementNotFoundEmbed(error);
             } else if (error instanceof ElementNotFoundError) {
                 return generateItemNotFoundErrorEmbed(randomCommandOptions);
             } else if (error instanceof Error) {
