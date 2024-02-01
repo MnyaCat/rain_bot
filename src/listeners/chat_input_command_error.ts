@@ -9,12 +9,10 @@ import {
     buildRandomStageElementNotFoundEmbed,
     buildRandomSubWeaponElementNotFoundEmbed,
     buildRandomWeaponElementNotFoundEmbed,
-    generateItemNotFoundErrorEmbed,
 } from "../utils/embed_builder";
 import {
     ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
-    ElementNotFoundError,
     RandomWeaponElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
     RandomSpecialWeaponElementNotFoundError,
@@ -34,24 +32,6 @@ export class ChatInputCommandErrorListener extends Listener {
         { interaction }: ChatInputCommandErrorPayload
     ) {
         const embed = await (() => {
-            const subWeaponId =
-                interaction.options.getNumber("sub") ?? undefined;
-            const specialWeaponId =
-                interaction.options.getNumber("special") ?? undefined;
-            const seasonId =
-                interaction.options.getNumber("season") ?? undefined;
-            const weaponTypeId =
-                interaction.options.getNumber("weapontype") ?? undefined;
-            const single = interaction.options.getBoolean("single") ?? false;
-
-            const randomCommandOptions = {
-                subWeaponId,
-                specialWeaponId,
-                seasonId,
-                weaponTypeId,
-                single,
-            };
-
             if (error instanceof ExecutedMemberNotFound) {
                 return buildErrorEmbed(
                     "実行したユーザーの情報が取得できませんでした。"
@@ -60,8 +40,6 @@ export class ChatInputCommandErrorListener extends Listener {
                 return buildErrorEmbed(
                     "ボイスチャンネルの情報が取得できませんでした。実行したサーバーでボイスチャンネルに参加しているか確かめてください。"
                 );
-                // TODO: ElementNotFoundErrorを継承した例外ごとに処理を分ける
-                // エラーメッセージのEmbedをgenerateItemNotFoundErrorEmbedで一纏めにしない
             } else if (error instanceof RandomWeaponElementNotFoundError) {
                 return buildRandomWeaponElementNotFoundEmbed(error);
             } else if (error instanceof RandomSubWeaponElementNotFoundError) {
@@ -72,8 +50,6 @@ export class ChatInputCommandErrorListener extends Listener {
                 return buildRandomSpecialWeaponElementNotFoundEmbed(error);
             } else if (error instanceof RandomStageElementNotFoundError) {
                 return buildRandomStageElementNotFoundEmbed(error);
-            } else if (error instanceof ElementNotFoundError) {
-                return generateItemNotFoundErrorEmbed(randomCommandOptions);
             } else if (error instanceof Error) {
                 return buildErrorEmbed(`throw: ${error.message}`);
             } else {
