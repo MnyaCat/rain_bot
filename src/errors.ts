@@ -106,7 +106,7 @@ export class RandomSpecialWeaponElementNotFoundError extends ElementNotFoundErro
     }
 }
 
-export class RandomStageWeaponElementNotFoundError extends ElementNotFoundError {
+export class RandomStageElementNotFoundError extends ElementNotFoundError {
     seasonId: number | undefined;
 
     constructor({
@@ -117,12 +117,9 @@ export class RandomStageWeaponElementNotFoundError extends ElementNotFoundError 
         seasonId: number | undefined;
     }) {
         super(message ?? "There is no stage that meets the requirements.");
-        this.name = "RandomStageWeaponElementNotFoundError";
+        this.name = "RandomStageElementNotFoundError";
         this.seasonId = seasonId;
-        Object.setPrototypeOf(
-            this,
-            RandomStageWeaponElementNotFoundError.prototype
-        );
+        Object.setPrototypeOf(this, RandomStageElementNotFoundError.prototype);
     }
 }
 

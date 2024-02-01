@@ -13,7 +13,7 @@ import {
 import { buildCustomId, getVoiceChannelMembers } from "../utils/utils";
 import {
     RandomSpecialWeaponElementNotFoundError,
-    RandomStageWeaponElementNotFoundError,
+    RandomStageElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
     RandomWeaponElementNotFoundError,
 } from "../errors";
@@ -553,7 +553,7 @@ export class RandomCommand extends Command {
         const randomCategory = randomCategoryName.stage;
 
         if (stages.length < 1) {
-            throw new RandomStageWeaponElementNotFoundError({
+            throw new RandomStageElementNotFoundError({
                 seasonId: seasonId,
             });
         }
