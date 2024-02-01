@@ -1,33 +1,11 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command, container } from "@sapphire/framework";
-import { errorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embed_builder";
 import { EmbedBuilder } from "discord.js";
-import { getVoiceChannel } from "../utils/utils";
+import { getVoiceChannel, shuffleArray } from "../utils/utils";
 
 const commandId = process.env.GROUPING_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;
-
-function grouping(members: string[], groupSize: number) {
-    // membersに変更を加えないためにシャローコピー
-    const shuffledMembers = [...members];
-    // Fisher-Yatesアルゴリズムを使ったシャッフル
-    for (let i = shuffledMembers.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledMembers[i], shuffledMembers[j]] = [
-            shuffledMembers[j],
-            shuffledMembers[i],
-        ];
-    }
-
-    const groups: string[][] = [];
-    // iからi+groupSizeまで取り出し、i+groupSizeをiに代入
-    // groupSizeが3の場合は0,1を取り出す→2,3,4を取り出す→5,6,7を取り出す
-    for (let i = 0; i < shuffledMembers.length; i += groupSize) {
-        groups.push(shuffledMembers.slice(i, i + groupSize));
-    }
-
-    return groups;
-}
 
 @ApplyOptions<Command.Options>({
     name: "grouping",
@@ -79,11 +57,10 @@ export class GroupingCommand extends Command {
             interaction.options.getString("additional-member") ?? "";
         const exclude = interaction.options.getString("exclude-member") ?? "";
 
-        const lastGroupingResults = container.lastGroupingResults;
-        console.log(lastGroupingResults);
+        const lastGroupingResults = container.lastGroupingResult;
 
         if (maxGroupSize < 2) {
-            const embed = errorEmbed(
+            const embed = buildErrorEmbed(
                 "`groupsize`に入力された数値が範囲外です。2以上の値を入力してください。"
             );
             return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -97,18 +74,20 @@ export class GroupingCommand extends Command {
         ].map((value) => value[1]);
 
         const voiceChannel = await getVoiceChannel(interaction);
-        const voiceChannnelMembers = voiceChannel.members
-            .map((member) => member.id)
-            .concat(additionalMemberIds);
-        const includeMemberMentions: string[] = [];
-        for (let i = 0; i < voiceChannnelMembers.length; i++) {
-            const memberId = voiceChannnelMembers[i];
-            if (!excludeMemberIds.includes(memberId)) {
-                includeMemberMentions.push(`<@${memberId}>`);
-            }
-        }
-        if (includeMemberMentions.length < 1) {
-            const embed = errorEmbed(
+        const voiceChannnelMemberIds = voiceChannel.members.map(
+            (member) => member.id
+        );
+        const targetMemberIds = voiceChannnelMemberIds
+            .concat(additionalMemberIds)
+            .filter(
+                (targetMemberId) =>
+                    !excludeMemberIds.some(
+                        (excludeMemberId) => excludeMemberId === targetMemberId
+                    )
+            );
+
+        if (targetMemberIds.length < 1) {
+            const embed = buildErrorEmbed(
                 "グループ分けの対象メンバーが1人未満です。`exclude`オプションを変更してください。"
             );
             return interaction.reply({ embeds: [embed], ephemeral: true });
@@ -116,14 +95,14 @@ export class GroupingCommand extends Command {
 
         // メンバー数をできる限り均等にするために調整
         const groupSize =
-            includeMemberMentions.length /
-            Math.ceil(includeMemberMentions.length / maxGroupSize);
+            targetMemberIds.length /
+            Math.ceil(targetMemberIds.length / maxGroupSize);
 
         let loopLimitReached = false;
 
         const groups = (() => {
-            if (includeMemberMentions.length > groupSize) {
-                let groups = grouping(includeMemberMentions, groupSize);
+            if (targetMemberIds.length > groupSize) {
+                let groups = this.grouping(targetMemberIds, groupSize);
                 if (lastGroupingResults != undefined) {
                     const loopLimit = 10;
                     let count = 0;
@@ -131,7 +110,7 @@ export class GroupingCommand extends Command {
                         this.groupingResultEqual(lastGroupingResults, groups) &&
                         count < loopLimit
                     ) {
-                        groups = grouping(includeMemberMentions, groupSize);
+                        groups = this.grouping(targetMemberIds, groupSize);
                         count += 1;
                     }
 
@@ -141,7 +120,7 @@ export class GroupingCommand extends Command {
                 }
                 return groups;
             } else {
-                return [[...includeMemberMentions]];
+                return [[...targetMemberIds]];
             }
         })();
 
@@ -149,9 +128,12 @@ export class GroupingCommand extends Command {
             .setTitle("グループ分けの結果")
             .setFooter({ text: `groupsize: ${maxGroupSize}` });
         for (let i = 0; i < groups.length; i++) {
+            const memberMentions = groups[i].map(
+                (memberId) => `<@${memberId}>`
+            );
             embed.addFields({
                 name: `グループ${i + 1}`,
-                value: groups[i].join("\n"),
+                value: memberMentions.join("\n"),
             });
         }
 
@@ -161,9 +143,21 @@ export class GroupingCommand extends Command {
             );
         }
 
-        container.lastGroupingResults = groups;
+        container.lastGroupingResult = groups;
 
         return interaction.reply({ embeds: [embed] });
+    }
+
+    private grouping(memberIds: string[], groupSize: number) {
+        const shuffledMembers = shuffleArray(memberIds);
+        const groups: string[][] = [];
+
+        // iからi+groupSizeまで取り出し、i+groupSizeをiに代入
+        // groupSizeが3の場合は0,1を取り出す→2,3,4を取り出す→5,6,7を取り出す
+        for (let i = 0; i < shuffledMembers.length; i += groupSize) {
+            groups.push(shuffledMembers.slice(i, i + groupSize));
+        }
+        return groups;
     }
 
     private groupingResultEqual(result1: string[][], result2: string[][]) {

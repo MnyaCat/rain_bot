@@ -4,13 +4,19 @@ import {
     ChatInputCommandErrorPayload,
 } from "@sapphire/framework";
 import {
-    errorEmbed,
-    generateItemNotFoundErrorEmbed,
+    buildErrorEmbed,
+    buildRandomSpecialWeaponElementNotFoundEmbed,
+    buildRandomStageElementNotFoundEmbed,
+    buildRandomSubWeaponElementNotFoundEmbed,
+    buildRandomWeaponElementNotFoundEmbed,
 } from "../utils/embed_builder";
 import {
-    GuildMemberNotFoundError,
+    ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
-    ItemNotFoundError,
+    RandomWeaponElementNotFoundError,
+    RandomSubWeaponElementNotFoundError,
+    RandomSpecialWeaponElementNotFoundError,
+    RandomStageElementNotFoundError,
 } from "../errors";
 
 export class ChatInputCommandErrorListener extends Listener {
@@ -26,38 +32,28 @@ export class ChatInputCommandErrorListener extends Listener {
         { interaction }: ChatInputCommandErrorPayload
     ) {
         const embed = await (() => {
-            const subWeaponId =
-                interaction.options.getNumber("sub") ?? undefined;
-            const specialWeaponId =
-                interaction.options.getNumber("special") ?? undefined;
-            const seasonId =
-                interaction.options.getNumber("season") ?? undefined;
-            const weaponTypeId =
-                interaction.options.getNumber("weapontype") ?? undefined;
-            const single = interaction.options.getBoolean("single") ?? false;
-
-            const randomCommandOptions = {
-                subWeaponId,
-                specialWeaponId,
-                seasonId,
-                weaponTypeId,
-                single,
-            };
-
-            if (error instanceof GuildMemberNotFoundError) {
-                return errorEmbed(
+            if (error instanceof ExecutedMemberNotFound) {
+                return buildErrorEmbed(
                     "実行したユーザーの情報が取得できませんでした。"
                 );
             } else if (error instanceof MemberVoiceChannelNotFoundError) {
-                return errorEmbed(
+                return buildErrorEmbed(
                     "ボイスチャンネルの情報が取得できませんでした。実行したサーバーでボイスチャンネルに参加しているか確かめてください。"
                 );
-            } else if (error instanceof ItemNotFoundError) {
-                return generateItemNotFoundErrorEmbed(randomCommandOptions);
+            } else if (error instanceof RandomWeaponElementNotFoundError) {
+                return buildRandomWeaponElementNotFoundEmbed(error);
+            } else if (error instanceof RandomSubWeaponElementNotFoundError) {
+                return buildRandomSubWeaponElementNotFoundEmbed(error);
+            } else if (
+                error instanceof RandomSpecialWeaponElementNotFoundError
+            ) {
+                return buildRandomSpecialWeaponElementNotFoundEmbed(error);
+            } else if (error instanceof RandomStageElementNotFoundError) {
+                return buildRandomStageElementNotFoundEmbed(error);
             } else if (error instanceof Error) {
-                return errorEmbed(`throw: ${error.message}`);
+                return buildErrorEmbed(`throw: ${error.message}`);
             } else {
-                return errorEmbed(`throw: ${error}`);
+                return buildErrorEmbed(`throw: ${error}`);
             }
         })();
 

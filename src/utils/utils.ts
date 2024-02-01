@@ -6,11 +6,12 @@ import {
 } from "discord.js";
 import {
     CommandOptionFetchFailedError,
-    GuildMemberNotFoundError,
+    ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     MemberVoiceChannelNotJoining,
 } from "../errors";
 import { RandomCommandOptions } from "../commands/random";
+import { ButtonIdDelimiter } from "../constants";
 
 export async function getExecutedMember(
     interaction: ChatInputCommandInteraction | ButtonInteraction
@@ -20,7 +21,7 @@ export async function getExecutedMember(
             ? interaction.member
             : interaction.guild?.members.cache.get(interaction.user.id);
     if (!member) {
-        throw new GuildMemberNotFoundError();
+        throw new ExecutedMemberNotFound();
     } else {
         return member;
     }
@@ -68,4 +69,36 @@ export async function getRandomCommandOptions(interaction: ButtonInteraction) {
         throw new CommandOptionFetchFailedError();
     }
     return JSON.parse(optionsJson) as RandomCommandOptions;
+}
+
+export function shuffleArray<T>(array: T[]): T[] {
+    // membersに変更を加えないためにシャローコピー
+    const shuffledArray = [...array];
+    // Fisher-Yatesアルゴリズムを使ったシャッフル
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [
+            shuffledArray[j],
+            shuffledArray[i],
+        ];
+    }
+
+    return shuffledArray;
+}
+
+// ボタンのcustomIdは`buttonId;options`の構造になっている
+// その内、buttonIdが一致しているかを調べる
+// startWithで比較すると、reroll-weapontypeを押すとreroll-weaponも反応してしまうため
+export function checkCustomId(customId: string, targetId: string) {
+    let buttonId: string;
+    if (customId.includes(ButtonIdDelimiter)) {
+        buttonId = customId.substring(0, customId.indexOf(ButtonIdDelimiter));
+    } else {
+        buttonId = customId;
+    }
+    return buttonId === targetId;
+}
+
+export function buildCustomId(id: string, options?: string) {
+    return id + ButtonIdDelimiter + options ?? "";
 }

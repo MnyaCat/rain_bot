@@ -1,4 +1,5 @@
 export const errorColor = 0xf23f42;
+export const ButtonIdDelimiter = ";";
 export const rerollButtonIds = {
     weapon: "reroll-weapon",
     mainWeapon: "reroll-mainweapon",

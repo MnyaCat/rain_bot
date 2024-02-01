@@ -6,7 +6,11 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { RandomCommand } from "../commands/random";
-import { checkVoiceChannelJoining, getExecutedMember } from "../utils/utils";
+import {
+    checkCustomId,
+    checkVoiceChannelJoining,
+    getExecutedMember,
+} from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -22,7 +26,8 @@ export class ButtonHandler extends InteractionHandler {
     }
 
     public override parse(interaction: ButtonInteraction) {
-        if (interaction.customId !== rerollButtonIds.rule) return this.none();
+        if (!checkCustomId(interaction.customId, rerollButtonIds.rule))
+            return this.none();
         return this.some();
     }
 }

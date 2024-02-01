@@ -5,30 +5,36 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommand } from "../commands/random";
+import { RandomCommand, RandomStageOptions } from "../commands/random";
 import {
+    checkCustomId,
     checkVoiceChannelJoining,
     getExecutedMember,
-    getRandomCommandOptions,
 } from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
 })
 export class ButtonHandler extends InteractionHandler {
-    public async run(interaction: ButtonInteraction) {
+    public async run(
+        interaction: ButtonInteraction,
+        parsedData: InteractionHandler.ParseResult<this>
+    ) {
         const member = await getExecutedMember(interaction);
         checkVoiceChannelJoining(member);
-        const options = await getRandomCommandOptions(interaction);
+        const options = parsedData.options;
         const replyOptions = await RandomCommand.buildRandomStageResult({
-            options,
+            seasonId: options.seasonId,
             timestamp: true,
         });
         await interaction.update(replyOptions);
     }
 
     public override parse(interaction: ButtonInteraction) {
-        if (interaction.customId !== rerollButtonIds.stage) return this.none();
-        return this.some();
+        const customId = interaction.customId;
+        if (!checkCustomId(customId, rerollButtonIds.stage)) return this.none();
+        const json = customId.substring(customId.indexOf(";") + 1);
+        const options = JSON.parse(json) as RandomStageOptions;
+        return this.some({ options: options });
     }
 }
