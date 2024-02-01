@@ -6,6 +6,7 @@ import {
 import {
     buildErrorEmbed,
     buildRandomSpecialWeaponElementNotFoundEmbed,
+    buildRandomStageElementNotFoundEmbed,
     buildRandomSubWeaponElementNotFoundEmbed,
     buildRandomWeaponElementNotFoundEmbed,
     generateItemNotFoundErrorEmbed,
@@ -17,6 +18,7 @@ import {
     RandomWeaponElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
     RandomSpecialWeaponElementNotFoundError,
+    RandomStageElementNotFoundError,
 } from "../errors";
 
 export class ChatInputCommandErrorListener extends Listener {
@@ -68,6 +70,8 @@ export class ChatInputCommandErrorListener extends Listener {
                 error instanceof RandomSpecialWeaponElementNotFoundError
             ) {
                 return buildRandomSpecialWeaponElementNotFoundEmbed(error);
+            } else if (error instanceof RandomStageElementNotFoundError) {
+                return buildRandomStageElementNotFoundEmbed(error);
             } else if (error instanceof ElementNotFoundError) {
                 return generateItemNotFoundErrorEmbed(randomCommandOptions);
             } else if (error instanceof Error) {
