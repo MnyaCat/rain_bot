@@ -3,6 +3,7 @@ import { errorColor } from "../constants";
 import { container } from "@sapphire/framework";
 import { RandomCommandOptions } from "../commands/random";
 import {
+    RandomSpecialWeaponElementNotFoundError,
     RandomSubWeaponElementNotFoundError,
     RandomWeaponElementNotFoundError,
 } from "../errors";
@@ -136,5 +137,26 @@ export async function buildRandomSubWeaponElementNotFoundEmbed(
 
     return buildErrorEmbed(
         "以下の条件に合うサブウェポンがありません。\n\n" + errorMessage
+    );
+}
+
+export async function buildRandomSpecialWeaponElementNotFoundEmbed(
+    error: RandomSpecialWeaponElementNotFoundError
+) {
+    const prisma = container.database;
+    const seasonFilter =
+        error.seasonId != null
+            ? await prisma.season.findFirst({ where: { id: error.seasonId } })
+            : null;
+    const options = new Map([["シーズン", seasonFilter]]);
+    let errorMessage = "";
+    for (const [key, value] of options) {
+        if (value != undefined) {
+            errorMessage += `- ${key}: **${value.name}**\n`;
+        }
+    }
+
+    return buildErrorEmbed(
+        "以下の条件に合うスペシャルウェポンがありません。\n\n" + errorMessage
     );
 }
