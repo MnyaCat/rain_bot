@@ -13,7 +13,8 @@
 
 ## Build
 
-`$ npm run build`
+prismaクライアントの生成、TypeScriptのコンパイルを行う必要があります。
+`$ npm run build`を実行することで、必要な作業を行えます。
 
 ## LICENSE
 
