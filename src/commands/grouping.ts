@@ -124,9 +124,7 @@ export class GroupingCommand extends Command {
             }
         })();
 
-        const embed = new EmbedBuilder()
-            .setTitle("グループ分けの結果")
-            .setFooter({ text: `groupsize: ${maxGroupSize}` });
+        const embed = new EmbedBuilder().setTitle("グループ分けの結果");
         for (let i = 0; i < groups.length; i++) {
             const memberMentions = groups[i].map(
                 (memberId) => `<@${memberId}>`
@@ -166,4 +164,8 @@ export class GroupingCommand extends Command {
             JSON.stringify([...result2].map((item) => item.sort()).sort())
         );
     }
+}
+
+export interface GroupingOptions {
+    groupSize: number;
 }
