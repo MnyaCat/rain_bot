@@ -75,6 +75,10 @@ export function checkVoiceChannelJoining(member: GuildMember) {
     }
 }
 
+export function isVoiceChannelJoinig(member: GuildMember) {
+    return Boolean(member.voice.channel);
+}
+
 export async function getRandomCommandOptions(interaction: ButtonInteraction) {
     const optionsJson = interaction.message.embeds[0].footer?.text;
     if (optionsJson == undefined) {
