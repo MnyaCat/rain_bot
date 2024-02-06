@@ -13,6 +13,14 @@ import {
 } from "../errors";
 import { RandomCommandOptions } from "../commands/random";
 import { ButtonIdDelimiter } from "../constants";
+import {
+    Weapon,
+    SubWeapon,
+    SpecialWeapon,
+    WeaponType,
+    Rule,
+    Stage,
+} from "../../prisma/generated/splatoon_client";
 
 export async function getExecutedMember(
     interaction: ChatInputCommandInteraction | ButtonInteraction
@@ -116,4 +124,11 @@ export function generateChoices(
             value: weapon.id,
         } as APIApplicationCommandOptionChoice<number>;
     });
+}
+
+export function getRandomElement<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+>(weapons: T[]): T {
+    const index = Math.floor(Math.random() * weapons.length);
+    return weapons[index];
 }
