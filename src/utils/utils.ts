@@ -1,6 +1,9 @@
 import {
     APIApplicationCommandOptionChoice,
+    ActionRowBuilder,
+    ButtonBuilder,
     ButtonInteraction,
+    ButtonStyle,
     ChatInputCommandInteraction,
     GuildMember,
     VoiceBasedChannel,
@@ -131,4 +134,12 @@ export function getRandomElement<
 >(weapons: T[]): T {
     const index = Math.floor(Math.random() * weapons.length);
     return weapons[index];
+}
+
+export function buildRerollActionRow(customId: string) {
+    const rerollButton = new ButtonBuilder()
+        .setCustomId(customId)
+        .setLabel("再ロール")
+        .setStyle(ButtonStyle.Primary);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(rerollButton);
 }
