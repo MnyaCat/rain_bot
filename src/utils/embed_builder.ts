@@ -131,7 +131,7 @@ export async function buildRandomStageElementNotFoundEmbed(
     );
 }
 
-export function buildResultEmbed<
+export function buildRandomResultEmbed<
     T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
 >({
     members,
@@ -164,7 +164,7 @@ export function buildResultEmbed<
     return embed;
 }
 
-export function buildSingleResultEmbed<
+export function buildOnlyOneRandomResultEmbed<
     T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
 >({
     elements,
