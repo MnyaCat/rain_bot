@@ -1,4 +1,5 @@
 import {
+    APIApplicationCommandOptionChoice,
     ButtonInteraction,
     ChatInputCommandInteraction,
     GuildMember,
@@ -101,4 +102,18 @@ export function checkCustomId(customId: string, targetId: string) {
 
 export function buildCustomId(id: string, options?: string) {
     return id + ButtonIdDelimiter + options ?? "";
+}
+
+export function generateChoices(
+    weapons: {
+        id: number;
+        name: string;
+    }[]
+) {
+    return weapons.map((weapon) => {
+        return {
+            name: weapon.name,
+            value: weapon.id,
+        } as APIApplicationCommandOptionChoice<number>;
+    });
 }
