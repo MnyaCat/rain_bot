@@ -54,7 +54,7 @@ export class RandomWeaponCommand extends Command {
                     .setName(this.name)
                     .setNameLocalization("ja", "ブキを抽選する")
                     .setDescription(
-                        "Raffles a random weapon. If in a voice channel, it raffles based on members; otherwise, raffles one."
+                        "Raffles a weapon. raffles based on voice channel members or one if not present."
                     )
                     .setDescriptionLocalization(
                         "ja",
