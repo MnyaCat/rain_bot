@@ -5,9 +5,9 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomWeaponOptions } from "../commands/randomWeapons";
+import { RandomWeaponOptions } from "../commands/randomWeapon";
 import { getExecutedMember, isVoiceChannelJoinig } from "../utils/utils";
-import { buildRandomWeaponResult } from "../commands/randomWeapons";
+import { buildRandomWeaponResult } from "../commands/randomWeapon";
 import { MemberVoiceChannelNotJoining } from "../errors";
 
 @ApplyOptions<InteractionHandler.Options>({
