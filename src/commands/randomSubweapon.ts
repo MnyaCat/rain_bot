@@ -29,7 +29,7 @@ const onlyOneOptionName = "onlyone";
 @ApplyOptions<Command.Options>({
     name: "random-subweapon",
 })
-export class RandomWeaponCommand extends Command {
+export class RandomSubWeaponCommand extends Command {
     public override async registerApplicationCommands(
         registry: Command.Registry
     ) {
