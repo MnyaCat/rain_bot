@@ -14,7 +14,7 @@ import { MemberVoiceChannelNotJoining } from "../errors";
 import {
     RandomSubWeaponOptions,
     buildRandomSubWeaponResult,
-} from "../commands/randomSubweapon";
+} from "../commands/randomSubWeapon";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
