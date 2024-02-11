@@ -5,7 +5,7 @@ import {
     buildRerollActionRow,
     generateChoices,
 } from "../utils/utils";
-import { buildOnlyOneRandomResultEmbed } from "../utils/embed_builder";
+import { buildOnlyOneRandomResultEmbed } from "../utils/embedBuilder";
 import { randomCategoryName, rerollButtonIds } from "../constants";
 import { RandomStageElementNotFoundError } from "../errors";
 import { BaseMessageOptions } from "discord.js";

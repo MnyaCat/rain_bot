@@ -18,7 +18,7 @@ import { RandomSpecialWeaponElementNotFoundError } from "../errors";
 import {
     buildOnlyOneRandomResultEmbed,
     buildRandomResultEmbed,
-} from "../utils/embed_builder";
+} from "../utils/embedBuilder";
 
 const commandId = process.env.RANDOM_SPECIALWEAPON_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;

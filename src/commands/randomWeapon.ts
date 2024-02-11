@@ -18,7 +18,7 @@ import { rerollButtonIds, randomCategoryName } from "../constants";
 import {
     buildOnlyOneRandomResultEmbed,
     buildRandomResultEmbed,
-} from "../utils/embed_builder";
+} from "../utils/embedBuilder";
 
 const commandId = process.env.RANDOM_WEAPON_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;

@@ -9,7 +9,7 @@ import {
     buildRandomStageElementNotFoundEmbed,
     buildRandomSubWeaponElementNotFoundEmbed,
     buildRandomWeaponElementNotFoundEmbed,
-} from "../utils/embed_builder";
+} from "../utils/embedBuilder";
 import {
     ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,

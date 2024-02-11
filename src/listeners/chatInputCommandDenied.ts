@@ -4,7 +4,7 @@ import {
     type ChatInputCommandDeniedPayload,
     type UserError,
 } from "@sapphire/framework";
-import { buildErrorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embedBuilder";
 
 export class ChatInputCommandDeniedListener extends Listener {
     public constructor(context: Listener.Context, options: Listener.Options) {

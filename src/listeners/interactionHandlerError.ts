@@ -1,5 +1,5 @@
 import { Events, Listener, InteractionHandlerError } from "@sapphire/framework";
-import { buildErrorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embedBuilder";
 import {
     CommandOptionFetchFailedError,
     ExecutedMemberNotFound,

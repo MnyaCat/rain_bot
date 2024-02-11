@@ -3,7 +3,7 @@ import { Command, container } from "@sapphire/framework";
 import { BaseMessageOptions } from "discord.js";
 import { randomCategoryName, rerollButtonIds } from "../constants";
 import { buildRerollActionRow, buildCustomId } from "../utils/utils";
-import { buildOnlyOneRandomResultEmbed } from "../utils/embed_builder";
+import { buildOnlyOneRandomResultEmbed } from "../utils/embedBuilder";
 
 const commandId = process.env.RANDOM_RULE_COMMAND_ID;
 const idHints = commandId != undefined ? [commandId] : undefined;

@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command, container } from "@sapphire/framework";
-import { buildErrorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embedBuilder";
 import { EmbedBuilder } from "discord.js";
 import { getVoiceChannel, shuffleArray } from "../utils/utils";
 
