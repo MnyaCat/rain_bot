@@ -6,11 +6,7 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { RandomCommand, RandomStageOptions } from "../commands/random";
-import {
-    checkCustomId,
-    checkVoiceChannelJoining,
-    getExecutedMember,
-} from "../utils/utils";
+import { checkCustomId } from "../utils/utils";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -20,8 +16,7 @@ export class ButtonHandler extends InteractionHandler {
         interaction: ButtonInteraction,
         parsedData: InteractionHandler.ParseResult<this>
     ) {
-        const member = await getExecutedMember(interaction);
-        checkVoiceChannelJoining(member);
+        // ボイスチャンネルのメンバーを参照しないのでボイスチャンネルにいるかのチェックはしない
         const options = parsedData.options;
         const replyOptions = await RandomCommand.buildRandomStageResult({
             seasonId: options.seasonId,
