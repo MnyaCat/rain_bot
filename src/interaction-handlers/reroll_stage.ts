@@ -5,8 +5,11 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommand, RandomStageOptions } from "../commands/random";
 import { checkCustomId } from "../utils/utils";
+import {
+    RandomStageOptions,
+    buildRandomStageResult,
+} from "../commands/RandomStage";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -18,7 +21,7 @@ export class ButtonHandler extends InteractionHandler {
     ) {
         // ボイスチャンネルのメンバーを参照しないのでボイスチャンネルにいるかのチェックはしない
         const options = parsedData.options;
-        const replyOptions = await RandomCommand.buildRandomStageResult({
+        const replyOptions = await buildRandomStageResult({
             seasonId: options.seasonId,
             timestamp: true,
         });
