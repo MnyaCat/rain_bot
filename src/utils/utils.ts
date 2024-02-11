@@ -9,12 +9,10 @@ import {
     VoiceBasedChannel,
 } from "discord.js";
 import {
-    CommandOptionFetchFailedError,
     ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     MemberVoiceChannelNotJoining,
 } from "../errors";
-import { RandomCommandOptions } from "../commands/random";
 import { ButtonIdDelimiter } from "../constants";
 import {
     Weapon,
@@ -77,14 +75,6 @@ export function checkVoiceChannelJoining(member: GuildMember) {
 
 export function isVoiceChannelJoinig(member: GuildMember) {
     return Boolean(member.voice.channel);
-}
-
-export async function getRandomCommandOptions(interaction: ButtonInteraction) {
-    const optionsJson = interaction.message.embeds[0].footer?.text;
-    if (optionsJson == undefined) {
-        throw new CommandOptionFetchFailedError();
-    }
-    return JSON.parse(optionsJson) as RandomCommandOptions;
 }
 
 export function shuffleArray<T>(array: T[]): T[] {
