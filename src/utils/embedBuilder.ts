@@ -1,4 +1,4 @@
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, GuildMember } from "discord.js";
 import { errorColor } from "../constants";
 import { container } from "@sapphire/framework";
 import {
@@ -7,6 +7,15 @@ import {
     RandomSubWeaponElementNotFoundError,
     RandomWeaponElementNotFoundError,
 } from "../errors";
+import {
+    Weapon,
+    SubWeapon,
+    SpecialWeapon,
+    WeaponType,
+    Rule,
+    Stage,
+} from "../../prisma/generated/splatoon_client";
+import { getRandomElement } from "./utils";
 
 export function buildErrorEmbed(description?: string) {
     const embed = new EmbedBuilder()
@@ -120,4 +129,62 @@ export async function buildRandomStageElementNotFoundEmbed(
     return buildErrorEmbed(
         "以下の条件に合うステージがありません。\n\n" + errorMessage
     );
+}
+
+export function buildRandomResultEmbed<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+>({
+    members,
+    elements,
+    randomCategory,
+    timestamp = false,
+}: {
+    members: GuildMember[];
+    elements: T[];
+    randomCategory: string;
+    timestamp?: boolean;
+}) {
+    const embed = new EmbedBuilder().setTitle(
+        `${randomCategory}の抽選結果です！`
+    );
+
+    const results = [];
+    for (let i = 0; i < members.length; i++) {
+        const member = members[i];
+        const weapon = getRandomElement(elements);
+        const mention = `<@${member.id}>`;
+        results.push(`- ${mention}: ${weapon.name}`);
+    }
+    embed.setDescription(results.join("\n"));
+
+    if (timestamp) {
+        embed.setTimestamp(new Date());
+    }
+
+    return embed;
+}
+
+export function buildOnlyOneRandomResultEmbed<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+>({
+    elements,
+    randomCategory,
+    timestamp = false,
+}: {
+    elements: T[];
+    randomCategory: string;
+    timestamp?: boolean;
+}) {
+    const embed = new EmbedBuilder().setTitle(
+        `${randomCategory}の抽選結果です！`
+    );
+
+    const randomElement = getRandomElement(elements);
+    embed.setDescription(randomElement.name);
+
+    if (timestamp) {
+        embed.setTimestamp(new Date());
+    }
+
+    return embed;
 }

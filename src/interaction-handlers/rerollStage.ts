@@ -5,12 +5,11 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommand, RandomSubWeaponOptions } from "../commands/random";
+import { checkCustomId } from "../utils/utils";
 import {
-    checkCustomId,
-    checkVoiceChannelJoining,
-    getExecutedMember,
-} from "../utils/utils";
+    RandomStageOptions,
+    buildRandomStageResult,
+} from "../commands/RandomStage";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
@@ -20,13 +19,10 @@ export class ButtonHandler extends InteractionHandler {
         interaction: ButtonInteraction,
         parsedData: InteractionHandler.ParseResult<this>
     ) {
-        const member = await getExecutedMember(interaction);
-        checkVoiceChannelJoining(member);
+        // ボイスチャンネルのメンバーを参照しないのでボイスチャンネルにいるかのチェックはしない
         const options = parsedData.options;
-        const replyOptions = await RandomCommand.buildRandomSubWeaponResult({
-            interaction: interaction,
+        const replyOptions = await buildRandomStageResult({
             seasonId: options.seasonId,
-            single: options.single,
             timestamp: true,
         });
         await interaction.update(replyOptions);
@@ -34,10 +30,9 @@ export class ButtonHandler extends InteractionHandler {
 
     public override parse(interaction: ButtonInteraction) {
         const customId = interaction.customId;
-        if (!checkCustomId(customId, rerollButtonIds.subWeapon))
-            return this.none();
+        if (!checkCustomId(customId, rerollButtonIds.stage)) return this.none();
         const json = customId.substring(customId.indexOf(";") + 1);
-        const options = JSON.parse(json) as RandomSubWeaponOptions;
+        const options = JSON.parse(json) as RandomStageOptions;
         return this.some({ options: options });
     }
 }

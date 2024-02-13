@@ -1,17 +1,27 @@
 import {
+    APIApplicationCommandOptionChoice,
+    ActionRowBuilder,
+    ButtonBuilder,
     ButtonInteraction,
+    ButtonStyle,
     ChatInputCommandInteraction,
     GuildMember,
     VoiceBasedChannel,
 } from "discord.js";
 import {
-    CommandOptionFetchFailedError,
     ExecutedMemberNotFound,
     MemberVoiceChannelNotFoundError,
     MemberVoiceChannelNotJoining,
 } from "../errors";
-import { RandomCommandOptions } from "../commands/random";
 import { ButtonIdDelimiter } from "../constants";
+import {
+    Weapon,
+    SubWeapon,
+    SpecialWeapon,
+    WeaponType,
+    Rule,
+    Stage,
+} from "../../prisma/generated/splatoon_client";
 
 export async function getExecutedMember(
     interaction: ChatInputCommandInteraction | ButtonInteraction
@@ -63,12 +73,8 @@ export function checkVoiceChannelJoining(member: GuildMember) {
     }
 }
 
-export async function getRandomCommandOptions(interaction: ButtonInteraction) {
-    const optionsJson = interaction.message.embeds[0].footer?.text;
-    if (optionsJson == undefined) {
-        throw new CommandOptionFetchFailedError();
-    }
-    return JSON.parse(optionsJson) as RandomCommandOptions;
+export function isVoiceChannelJoinig(member: GuildMember) {
+    return Boolean(member.voice.channel);
 }
 
 export function shuffleArray<T>(array: T[]): T[] {
@@ -101,4 +107,33 @@ export function checkCustomId(customId: string, targetId: string) {
 
 export function buildCustomId(id: string, options?: string) {
     return id + ButtonIdDelimiter + options ?? "";
+}
+
+export function generateChoices(
+    weapons: {
+        id: number;
+        name: string;
+    }[]
+) {
+    return weapons.map((weapon) => {
+        return {
+            name: weapon.name,
+            value: weapon.id,
+        } as APIApplicationCommandOptionChoice<number>;
+    });
+}
+
+export function getRandomElement<
+    T extends Weapon | SubWeapon | SpecialWeapon | WeaponType | Rule | Stage
+>(weapons: T[]): T {
+    const index = Math.floor(Math.random() * weapons.length);
+    return weapons[index];
+}
+
+export function buildRerollActionRow(customId: string) {
+    const rerollButton = new ButtonBuilder()
+        .setCustomId(customId)
+        .setLabel("再ロール")
+        .setStyle(ButtonStyle.Primary);
+    return new ActionRowBuilder<ButtonBuilder>().addComponents(rerollButton);
 }

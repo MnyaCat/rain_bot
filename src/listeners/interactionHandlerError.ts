@@ -1,5 +1,5 @@
 import { Events, Listener, InteractionHandlerError } from "@sapphire/framework";
-import { buildErrorEmbed } from "../utils/embed_builder";
+import { buildErrorEmbed } from "../utils/embedBuilder";
 import {
     CommandOptionFetchFailedError,
     ExecutedMemberNotFound,
@@ -25,7 +25,7 @@ export class InteractionHandlerErrorListener extends Listener {
                     );
                 } else if (error instanceof MemberVoiceChannelNotJoining) {
                     return buildErrorEmbed(
-                        "実行したサーバーでボイスチャンネルに参加している状態で実行してください。"
+                        "`1つのみ抽選する`オプションFalseの場合は、実行したサーバーでボイスチャンネルに参加している状態で実行してください。"
                     );
                 } else if (error instanceof MemberVoiceChannelNotFoundError) {
                     return buildErrorEmbed(

@@ -8,6 +8,8 @@ export class ExecutedMemberNotFound extends RainBotBaseError {
     }
 }
 
+// random系コマンドの再ロール時、OnlyOneがFalseかつボイスチャンネルに参加していない場合にスロー
+// 他の箇所でスローする必要ができたら、新しい例外クラスを作る
 export class MemberVoiceChannelNotJoining extends RainBotBaseError {
     constructor(message?: string) {
         super(message ?? "Member is not participating in the voice channel.");

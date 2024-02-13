@@ -5,21 +5,16 @@ import {
 } from "@sapphire/framework";
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
-import { RandomCommand } from "../commands/random";
-import {
-    checkCustomId,
-    checkVoiceChannelJoining,
-    getExecutedMember,
-} from "../utils/utils";
+import { checkCustomId } from "../utils/utils";
+import { buildRandomRuleResult } from "../commands/randomRule";
 
 @ApplyOptions<InteractionHandler.Options>({
     interactionHandlerType: InteractionHandlerTypes.Button,
 })
 export class ButtonHandler extends InteractionHandler {
     public async run(interaction: ButtonInteraction) {
-        const member = await getExecutedMember(interaction);
-        checkVoiceChannelJoining(member);
-        const replyOptions = await RandomCommand.buildRandomRuleResult({
+        // ボイスチャンネルのメンバーを参照しないのでボイスチャンネルにいるかのチェックはしない
+        const replyOptions = await buildRandomRuleResult({
             timestamp: true,
         });
         await interaction.update(replyOptions);
