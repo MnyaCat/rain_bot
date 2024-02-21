@@ -6,7 +6,11 @@ import {
 import type { ButtonInteraction } from "discord.js";
 import { rerollButtonIds } from "../constants";
 import { RandomWeaponOptions } from "../commands/randomWeapon";
-import { getExecutedMember, isVoiceChannelJoinig } from "../utils/utils";
+import {
+    checkCustomId,
+    getExecutedMember,
+    isVoiceChannelJoinig,
+} from "../utils/utils";
 import { buildRandomWeaponResult } from "../commands/randomWeapon";
 import { MemberVoiceChannelNotJoining } from "../errors";
 
@@ -41,10 +45,7 @@ export class ButtonHandler extends InteractionHandler {
 
     public override parse(interaction: ButtonInteraction) {
         const customId = interaction.customId;
-        if (
-            customId.substring(0, customId.indexOf(";")) !==
-            rerollButtonIds.weapon
-        )
+        if (!checkCustomId(customId, rerollButtonIds.weapon))
             return this.none();
         const json = customId.substring(customId.indexOf(";") + 1);
         const options = JSON.parse(json) as RandomWeaponOptions;
