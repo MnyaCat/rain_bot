@@ -37,3 +37,6 @@ package-lock.json
 prisma/generated
 dev.db
 prisma-script.ts
+
+# Prisma Script
+script/**.js
