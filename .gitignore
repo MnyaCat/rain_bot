@@ -40,3 +40,6 @@ prisma-script.ts
 
 # Prisma Script
 script/**.js
+
+# nodenv
+.node-version
