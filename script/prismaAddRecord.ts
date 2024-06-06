@@ -10,19 +10,19 @@ async function main() {
     // シーズンの追加
     await prisma.season.create({
         data: {
-            id: 7,
-            name: "2024夏 Sizzle Season",
-            startDate: new Date("2024-06-01T00:00:00.000Z"),
-            endDate: new Date("2024-08-31T23:59:59.000Z"),
+            id: 6,
+            name: "2024春 Fresh Season",
+            startDate: new Date("2024-03-01T00:00:00.000Z"),
+            endDate: new Date("2024-05-31T23:59:59.000Z"),
         },
     });
-    const seasonId = 7;
+    const seasonId = 6;
 
     // メインウェポンの追加
     const mainWeaponLastId = await prisma.mainWeapon.count();
     const mainWeapons = [
-        { name: "フルイドV", seasonId, weaponTypeId: 9 },
-        { name: "デンタルワイパー", seasonId, weaponTypeId: 10 },
+        { name: "ガエンFF", seasonId, weaponTypeId: 5 },
+        { name: "24式張替傘・甲", seasonId, weaponTypeId: 6 },
     ];
     for (let i = 0; i < mainWeapons.length; i++) {
         const mainWeapon = mainWeapons[i];
@@ -36,20 +36,9 @@ async function main() {
         });
     }
 
-    // 24式張替傘・甲の名前を変更
-    await prisma.mainWeapon.update({
-        where: { id: 60 },
-        data: { name: "24式張替傘" },
-    });
-    // 14式竹筒銃の名前に誤字があったので修正
-    await prisma.mainWeapon.update({
-        where: { id: 20 },
-        data: { name: "14式竹筒銃" },
-    });
-
     // ステージの追加
     const stageLastId = await prisma.stage.count();
-    const stages = [{ name: "リュウグウターミナル", seasonId }];
+    const stages = [{ name: "カジキ空港", seasonId }];
     for (let i = 0; i < stages.length; i++) {
         const stage = stages[i];
         await prisma.stage.create({
@@ -76,84 +65,92 @@ async function main() {
         },
         */
         {
-            name: "ロングブラスターカスタム",
-            subWeaponId: 0,
-            specialWeaponId: 16,
-            seasonId,
-            weaponTypeId: 7,
-            mainWeaponId: 42,
-        },
-        {
-            name: "14式竹筒銃・乙",
-            subWeaponId: 5,
-            specialWeaponId: 15,
-            seasonId,
-            weaponTypeId: 2,
-            mainWeaponId: 20,
-        },
-        {
-            name: "ハイドラントカスタム",
-            subWeaponId: 10,
+            name: ".52ガロンデコ",
+            subWeaponId: 6,
             specialWeaponId: 18,
             seasonId,
-            weaponTypeId: 4,
-            mainWeaponId: 29,
+            weaponTypeId: 0,
+            mainWeaponId: 6,
         },
         {
-            name: "イグザミナー・ヒュー",
-            subWeaponId: 0,
-            specialWeaponId: 11,
+            name: "ヴァリアブルローラーフォイル",
+            subWeaponId: 1,
+            specialWeaponId: 18,
+            seasonId,
+            weaponTypeId: 1,
+            mainWeaponId: 16,
+        },
+        {
+            name: "スクイックリンβ",
+            subWeaponId: 7,
+            specialWeaponId: 2,
+            seasonId,
+            weaponTypeId: 2,
+            mainWeaponId: 17,
+        },
+        {
+            name: "リッター4Kカスタム",
+            subWeaponId: 8,
+            specialWeaponId: 16,
+            seasonId,
+            weaponTypeId: 2,
+            mainWeaponId: 19,
+        },
+        {
+            name: "4Kスコープカスタム",
+            subWeaponId: 8,
+            specialWeaponId: 16,
+            seasonId,
+            weaponTypeId: 2,
+            mainWeaponId: 19,
+        },
+        {
+            name: "エクスプロッシャーカスタム",
+            subWeaponId: 4,
+            specialWeaponId: 17,
+            seasonId,
+            weaponTypeId: 3,
+            mainWeaponId: 26,
+        },
+        {
+            name: "モップリンD",
+            subWeaponId: 8,
+            specialWeaponId: 6,
+            seasonId,
+            weaponTypeId: 3,
+            mainWeaponId: 57,
+        },
+        {
+            name: "ノーチラス79",
+            subWeaponId: 1,
+            specialWeaponId: 17,
             seasonId,
             weaponTypeId: 4,
-            mainWeaponId: 58,
+            mainWeaponId: 31,
         },
         {
-            name: "ガエンFFカスタム",
-            subWeaponId: 2,
-            specialWeaponId: 13,
+            name: "ケルビン525デコ",
+            subWeaponId: 9,
+            specialWeaponId: 0,
+            seasonId,
+            weaponTypeId: 5,
+            mainWeaponId: 34,
+        },
+        {
+            name: "ガエンFF",
+            subWeaponId: 10,
+            specialWeaponId: 8,
             seasonId,
             weaponTypeId: 5,
             mainWeaponId: 59,
         },
         {
-            name: "24式張替傘・乙",
-            subWeaponId: 11,
-            specialWeaponId: 17,
+            name: "24式張替傘・甲",
+            subWeaponId: 12,
+            specialWeaponId: 1,
             seasonId,
             weaponTypeId: 6,
             mainWeaponId: 60,
-        },
-        {
-            name: "フルイドV",
-            subWeaponId: 7,
-            specialWeaponId: 10,
-            seasonId,
-            weaponTypeId: 9,
-            mainWeaponId: 61,
-        },
-        {
-            name: "フルイドVカスタム",
-            subWeaponId: 9,
-            specialWeaponId: 6,
-            seasonId,
-            weaponTypeId: 9,
-            mainWeaponId: 61,
-        },
-        {
-            name: "デンタルワイパーミント",
-            subWeaponId: 1,
-            specialWeaponId: 1,
-            seasonId,
-            weaponTypeId: 10,
-            mainWeaponId: 62,
-        },
-        {
-            name: "デンタルワイパースミ",
-            subWeaponId: 4,
-            specialWeaponId: 9,
-            seasonId,
-            weaponTypeId: 10,
-            mainWeaponId: 62,
         },
     ];
     weapons.sort((a, b) => a.weaponTypeId - b.weaponTypeId);
